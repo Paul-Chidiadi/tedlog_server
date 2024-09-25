@@ -22,7 +22,9 @@ export class UsersService {
     return savedResult;
   }
   async findAll(): Promise<User[]> {
-    return await this.userRepository.find();
+    return await this.userRepository.find({
+      relations: ['vouchers', 'dispatches'],
+    });
   }
 
   async findByEmail(email: string): Promise<User | undefined> {

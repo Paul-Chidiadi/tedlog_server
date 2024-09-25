@@ -7,6 +7,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { dataSourceOptions } from './common/config/db/typeORM.config';
 import { ConsignorModule } from './modules/consignor/consignor.module';
 import { DispatchModule } from './modules/dispatch/dispatch.module';
+import { AdminModule } from './modules/admin/admin.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { DispatchModule } from './modules/dispatch/dispatch.module';
     AuthModule,
     ConsignorModule,
     DispatchModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [AppService],

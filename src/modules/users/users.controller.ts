@@ -3,6 +3,7 @@ import {
   Get,
   HttpException,
   HttpStatus,
+  Param,
   Res,
   UseGuards,
 } from '@nestjs/common';
@@ -21,9 +22,9 @@ export class UsersController {
 
   @Roles(USER_ROLE.ADMIN, USER_ROLE.CONSIGNOR)
   @UseGuards(AuthGuard, RolesGuard)
-  @Get('')
-  async getUser(@CurrentUser() currentUser: ICurrentUser, @Res() response) {
-    const user = await this.usersService.findById(currentUser.sub);
+  @Get('/:id')
+  async getUser(@Param('id') id: string, @Res() response) {
+    const user = await this.usersService.findById(id);
     if (user) {
       return CreateSuccessResponse(response, user, 'Successfull');
     }
@@ -33,7 +34,7 @@ export class UsersController {
     );
   }
 
-  @Roles(USER_ROLE.ADMIN, USER_ROLE.CONSIGNOR)
+  @Roles(USER_ROLE.CONSIGNOR)
   @UseGuards(AuthGuard, RolesGuard)
   @Get('vouchers')
   async getUserVouchers(
