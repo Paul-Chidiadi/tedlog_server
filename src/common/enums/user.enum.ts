@@ -1,6 +1,6 @@
 export enum USER_ROLE {
-  SENDER = 'sender',
-  RECIEVER = 'reciever',
+  CONSIGNOR = 'consignor',
+  CONSIGNEE = 'consignee',
   DRIVER = 'driver',
   ADMIN = 'admin',
 }

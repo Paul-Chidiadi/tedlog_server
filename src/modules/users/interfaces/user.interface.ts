@@ -1,5 +1,6 @@
 import { USER_ROLE } from 'src/common/enums/user.enum';
 import { User } from '../entities/user.entity';
+import { Voucher } from 'src/modules/dispatch/entities/voucher.entity';
 
 export interface ILoginResponse {
   readonly accessToken?: string;
@@ -29,6 +30,7 @@ export interface IUser {
   email?: string;
   phoneNumber?: string;
   role?: USER_ROLE;
+  voucher?: Voucher;
   createdAt?: string;
   updatedAt?: string;
 }

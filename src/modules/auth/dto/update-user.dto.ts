@@ -6,11 +6,11 @@ import {
   IsOptional,
 } from 'class-validator';
 import { PASSWORD_RULE, PASSWORD_RULE_MESSAGE } from 'src/common/constants';
-import { USER_ROLE } from 'src/common/enums/user.enum';
 
-export class CreateUserDto {
+export class UpdateUserDto {
   @IsEmail()
-  @IsNotEmpty()
+  @IsString()
+  @IsOptional()
   email: string;
 
   @IsString()
@@ -18,6 +18,7 @@ export class CreateUserDto {
   @Matches(PASSWORD_RULE, {
     message: PASSWORD_RULE_MESSAGE,
   })
+  @IsOptional()
   password: string;
 
   @IsString()
@@ -25,17 +26,16 @@ export class CreateUserDto {
   @Matches(PASSWORD_RULE, {
     message: PASSWORD_RULE_MESSAGE,
   })
+  @IsOptional()
   confirmPassword: string;
 
   @IsString()
   @IsNotEmpty()
+  @IsOptional()
   name: string;
 
   @IsString()
   @IsNotEmpty()
-  role: USER_ROLE;
-
-  @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   phoneNumber: string;
 }

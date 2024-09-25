@@ -25,7 +25,7 @@ export class AuthController {
   async signup(@Body() createUserDto: CreateUserDto, @Res() response) {
     const user = await this.authService.signup(createUserDto);
     if (user) {
-      return CreateSuccessResponse(response, user, 'Registration Succesfull');
+      return CreateSuccessResponse(response, user, 'Registration Successfull');
     }
     throw new HttpException(
       'Unable to Create User. Please try again later!',

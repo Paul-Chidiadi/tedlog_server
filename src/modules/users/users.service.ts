@@ -10,6 +10,13 @@ export class UsersService {
     private readonly userRepository: Repository<User>,
   ) {}
 
+  async findUserVouchers(userId: string) {
+    return await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['vouchers'],
+    });
+  }
+
   async create(createUser: Partial<User>): Promise<User> {
     const savedResult = await this.userRepository.save(createUser);
     return savedResult;
@@ -23,7 +30,10 @@ export class UsersService {
   }
 
   async findById(userId: string): Promise<User | undefined> {
-    return await this.userRepository.findOne({ where: { id: userId } });
+    return await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['vouchers', 'dispatches'],
+    });
   }
 
   async findByEmailAndOtp(

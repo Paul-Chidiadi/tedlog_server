@@ -1,6 +1,8 @@
 import { DataSource, DataSourceOptions } from 'typeorm';
 import { dbConfig } from '../env.config';
 import { User } from 'src/modules/users/entities/user.entity';
+import { Dispatch } from 'src/modules/dispatch/entities/dispatch.entity';
+import { Voucher } from 'src/modules/dispatch/entities/voucher.entity';
 
 export const dataSourceOptions: DataSourceOptions = {
   // TypeORM PostgreSQL DB Drivers
@@ -10,7 +12,7 @@ export const dataSourceOptions: DataSourceOptions = {
   username: dbConfig.DB_USERNAME,
   password: dbConfig.DB_PASSWORD,
   database: dbConfig.DB_DATABASE,
-  entities: [User],
+  entities: [User, Dispatch, Voucher],
   synchronize: true,
   ssl: dbConfig.DB_SSL === 'true' ? { rejectUnauthorized: false } : undefined,
 };
