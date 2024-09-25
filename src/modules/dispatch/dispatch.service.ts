@@ -5,7 +5,7 @@ import { Dispatch } from './entities/dispatch.entity';
 import { UsersService } from '../users/users.service';
 import { Utilities } from 'src/common/utils/utils.service';
 import { DISPATCH_STATUS } from 'src/common/enums/dispatch.enum';
-import { Repository } from 'typeorm';
+import { Repository, UpdateResult } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Voucher } from './entities/voucher.entity';
 
@@ -59,6 +59,7 @@ export class DispatchService {
         cost,
         user: userData,
         dispatchId,
+        dateDelivered: new Date(),
         status: DISPATCH_STATUS.PENDING,
       };
       const dispatch = await this.dispatchRepository.save(payload);
@@ -72,5 +73,26 @@ export class DispatchService {
         'Insufficeint funds, Please fund your wallet',
         HttpStatus.BAD_REQUEST,
       );
+  }
+
+  async getDispatch(id: string): Promise<Dispatch> {
+    const dispatchData = await this.dispatchRepository.findOne({
+      where: { dispatchId: id },
+      relations: ['user'],
+    });
+    return dispatchData;
+  }
+
+  async updateDispatch(
+    body: Partial<IDispatch>,
+    id: string,
+  ): Promise<UpdateResult> {
+    const { status } = body;
+    const payload: Partial<IDispatch> =
+      status === DISPATCH_STATUS.COMPLETED
+        ? { status: status, dateRecieved: new Date() }
+        : { status: status };
+    const result = await this.dispatchRepository.update({ id }, payload);
+    return result;
   }
 }

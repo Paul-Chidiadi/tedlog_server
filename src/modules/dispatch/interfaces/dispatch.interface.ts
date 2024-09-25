@@ -1,4 +1,4 @@
-import { PRODUCT_TYPE } from 'src/common/enums/dispatch.enum';
+import { DISPATCH_STATUS, PRODUCT_TYPE } from 'src/common/enums/dispatch.enum';
 
 export interface IDispatch {
   id?: string;
@@ -13,4 +13,7 @@ export interface IDispatch {
   weight?: string;
   cost?: number;
   voucher?: string;
+  status?: DISPATCH_STATUS;
+  dateDelivered?: Date;
+  dateRecieved?: Date;
 }

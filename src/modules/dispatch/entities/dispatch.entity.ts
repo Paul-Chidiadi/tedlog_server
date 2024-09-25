@@ -21,7 +21,7 @@ export class Dispatch {
   dateDelivered: Date;
 
   @Column({ type: 'datetime', nullable: true })
-  DateRecieved: Date;
+  dateRecieved: Date;
 
   @Column({ length: 200 })
   consignorLocation: string;
