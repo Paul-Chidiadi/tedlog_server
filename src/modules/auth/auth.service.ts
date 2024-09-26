@@ -108,7 +108,13 @@ export class AuthService {
     //Save student into database
     if (sendMail.accepted[0] === email) {
       const data = await this.usersService.create(createdStudent);
-      return data;
+      const filteredData = {
+        ...data,
+        passwordDigest: null,
+        otpExpiresAt: null,
+        OTP: null,
+      };
+      return filteredData;
     }
   }
 
@@ -140,7 +146,11 @@ export class AuthService {
     const accessToken = await this.createAccessToken(payload);
     const refreshToken = await this.createRefreshToken(payload);
 
-    return { user: user, refreshToken, accessToken };
+    return {
+      user: { ...user, passwordDigest: null, otpExpiresAt: null, OTP: null },
+      refreshToken,
+      accessToken,
+    };
   }
 
   async resendOTP(email: string): Promise<UpdateResult> {

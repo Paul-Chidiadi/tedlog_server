@@ -19,6 +19,6 @@ import { envConfig } from 'src/common/config/env.config';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, UsersService, EmailService, Utilities, JwtService],
+  providers: [AuthService, UsersService, EmailService, Utilities],
 })
 export class AuthModule {}

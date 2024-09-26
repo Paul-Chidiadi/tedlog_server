@@ -62,7 +62,7 @@ export class Dispatch {
 
   @Column({
     type: 'enum',
-    enum: ['pending', 'completed'],
+    enum: ['pending', 'started', 'completed'],
     default: DISPATCH_STATUS.PENDING,
   })
   status: DISPATCH_STATUS;

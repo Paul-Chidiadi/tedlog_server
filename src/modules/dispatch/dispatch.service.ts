@@ -40,10 +40,18 @@ export class DispatchService {
 
     const userData = await this.usersService.findById(currentUser.sub);
     const voucherData = await this.voucherRepository.findOneBy({ id: voucher });
-    const usersBalance = userData.walletBalance;
+    if (!voucherData) {
+      throw new HttpException(
+        'Invalid Voucher, Please fund your wallet',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const usersBalance = Number(userData.walletBalance);
+    const voucherValue = Number(voucherData.value);
     if (
-      usersBalance >= cost ||
-      (voucher && userData.vouchers.length > 0 && voucherData.value >= cost)
+      usersBalance >= Number(cost) ||
+      (voucher && userData.vouchers.length > 0 && voucherValue >= Number(cost))
     ) {
       const dispatchId = `TEDLOG::${this.util.generateRandomCode(6, false)}`;
       const payload: Partial<Dispatch> = {
@@ -59,14 +67,19 @@ export class DispatchService {
         cost,
         user: userData,
         dispatchId,
-        dateDelivered: new Date(),
         status: DISPATCH_STATUS.PENDING,
       };
       const dispatch = await this.dispatchRepository.save(payload);
       if (dispatch && voucher) {
+        //remove voucher if user paid with his voucher
         await this.voucherRepository.remove(voucherData);
         return dispatch;
       }
+      //Deduct wallet balance if user paid with his wallet
+      const walletPayload = {
+        walletBalance: usersBalance - Number(cost),
+      };
+      await this.usersService.updateUser(walletPayload, userData.email);
       return dispatch;
     } else
       throw new HttpException(
@@ -83,6 +96,13 @@ export class DispatchService {
     return dispatchData;
   }
 
+  async getAllDispatch(): Promise<Dispatch[]> {
+    const dispatchData = await this.dispatchRepository.find({
+      relations: ['user'],
+    });
+    return dispatchData;
+  }
+
   async updateDispatch(
     body: Partial<IDispatch>,
     id: string,
@@ -91,8 +111,13 @@ export class DispatchService {
     const payload: Partial<IDispatch> =
       status === DISPATCH_STATUS.COMPLETED
         ? { status: status, dateRecieved: new Date() }
-        : { status: status };
-    const result = await this.dispatchRepository.update({ id }, payload);
+        : status === DISPATCH_STATUS.STARTED
+          ? { status: status, dateDelivered: new Date() }
+          : { status: status };
+    const result = await this.dispatchRepository.update(
+      { dispatchId: id },
+      payload,
+    );
     return result;
   }
 }

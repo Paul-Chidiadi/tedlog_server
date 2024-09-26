@@ -13,7 +13,7 @@ import {
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   // set port
-  const PORT = envConfig.PORT || 3000;
+  const PORT = envConfig.PORT || 5000;
 
   // allow cookie
   app.use(cookieParser());
@@ -37,7 +37,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe(ValidatorErrorHandler));
 
   // set global prefix
-  app.setGlobalPrefix('api/v2');
+  app.setGlobalPrefix('api/v1');
 
   await app.listen(PORT);
 }

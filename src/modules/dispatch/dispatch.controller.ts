@@ -43,7 +43,7 @@ export class DispatchController {
     );
   }
 
-  @Get('getDisatch/:id')
+  @Get('getDispatch/:id')
   async getDispatch(@Param('id') id: string, @Res() response) {
     const data = await this.dispatchService.getDispatch(id);
     if (data) {
@@ -55,9 +55,22 @@ export class DispatchController {
     );
   }
 
-  @Roles(USER_ROLE.ADMIN, USER_ROLE.DRIVER)
+  @Roles(USER_ROLE.ADMIN)
   @UseGuards(AuthGuard, RolesGuard)
-  @Patch('updateDisptch/:id')
+  @Get('getAllDisatch')
+  async getAllDispatch(@Res() response) {
+    const data = await this.dispatchService.getAllDispatch();
+    if (data) {
+      return CreateSuccessResponse(response, data, 'Successfull');
+    }
+    throw new HttpException(
+      'Unable to Get All Dispatch. Please try again later!',
+      HttpStatus.INTERNAL_SERVER_ERROR,
+    );
+  }
+
+  //ANYONE CAN UPDATE A DISPATCH
+  @Patch('updateDispatch/:id')
   async updateDispatch(
     @Body() body: UpdateDispatchDto,
     @Param('id') id: string,

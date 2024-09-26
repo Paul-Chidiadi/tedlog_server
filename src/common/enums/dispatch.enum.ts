@@ -14,5 +14,6 @@ export enum PRODUCT_TYPE {
 
 export enum DISPATCH_STATUS {
   PENDING = 'pending',
+  STARTED = 'started',
   COMPLETED = 'completed',
 }
