@@ -38,4 +38,9 @@ export class UpdateUserDto {
   @IsNotEmpty()
   @IsOptional()
   phoneNumber: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @IsOptional()
+  OTP: string;
 }

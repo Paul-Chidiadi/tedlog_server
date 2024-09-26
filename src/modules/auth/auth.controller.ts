@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -16,6 +17,9 @@ import { LoginDto } from './dto/login.dto';
 import { envConfig } from 'src/common/config/env.config';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { AuthGuard } from 'src/common/guards/auth.guard';
+import { CurrentUser } from 'src/common/decorator/current-user.decorator';
+import { ICurrentUser } from '../users/interfaces/user.interface';
 
 @Controller('auth')
 export class AuthController {
@@ -147,6 +151,72 @@ export class AuthController {
     }
     throw new HttpException(
       'Unable to refresh token. Please try again later.',
+      HttpStatus.INTERNAL_SERVER_ERROR,
+    );
+  }
+
+  @UseGuards(AuthGuard)
+  @Patch('editProfile')
+  async editProfile(
+    @Body() body: Partial<CreateUserDto>,
+    @CurrentUser() currentUser: ICurrentUser,
+    @Res() response,
+  ) {
+    const updatedResult = await this.authService.editProfile(currentUser, body);
+    if (updatedResult) {
+      return CreateSuccessResponse(
+        response,
+        updatedResult,
+        'Update Successfull',
+      );
+    }
+    throw new HttpException(
+      'Unable to Update User. Please try again later!',
+      HttpStatus.INTERNAL_SERVER_ERROR,
+    );
+  }
+
+  @UseGuards(AuthGuard)
+  @Patch('changePassword')
+  async changePassword(
+    @Body() body: Partial<CreateUserDto>,
+    @CurrentUser() currentUser: ICurrentUser,
+    @Res() response,
+  ) {
+    const updatedResult = await this.authService.changePassword(
+      currentUser,
+      body,
+    );
+    if (updatedResult) {
+      return CreateSuccessResponse(
+        response,
+        updatedResult,
+        'Update Successfull',
+      );
+    }
+    throw new HttpException(
+      'Unable to Change password. Please try again later!',
+      HttpStatus.INTERNAL_SERVER_ERROR,
+    );
+  }
+
+  @UseGuards(AuthGuard)
+  @Patch('changeEmail')
+  async changeEmail(
+    @Body() body: Partial<CreateUserDto>,
+    @CurrentUser() currentUser: ICurrentUser,
+    @Res() response,
+  ) {
+    const updatedResult = await this.authService.changeEmail(currentUser, body);
+    if (updatedResult) {
+      return CreateSuccessResponse(
+        response,
+        updatedResult,
+        'Update Successfull',
+      );
+    }
+    throw new HttpException(
+      'Unable to Chanage Email. Please try again later!',
       HttpStatus.INTERNAL_SERVER_ERROR,
     );
   }

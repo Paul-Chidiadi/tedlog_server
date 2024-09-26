@@ -3,7 +3,11 @@ import { UsersService } from '../users/users.service';
 import { EmailService } from 'src/common/utils/email.service';
 import { Utilities } from 'src/common/utils/utils.service';
 import { JwtService } from '@nestjs/jwt';
-import { ILoginResponse, IUser } from '../users/interfaces/user.interface';
+import {
+  ICurrentUser,
+  ILoginResponse,
+  IUser,
+} from '../users/interfaces/user.interface';
 import { User } from '../users/entities/user.entity';
 import { envConfig } from 'src/common/config/env.config';
 import { UpdateResult } from 'typeorm';
@@ -248,5 +252,91 @@ export class AuthService {
     if (sendEmail.accepted[0] === email) {
       return updatedUser;
     }
+  }
+
+  async editProfile(
+    currentUser: ICurrentUser,
+    body: Partial<IUser>,
+  ): Promise<UpdateResult> {
+    //Get user information
+    const user = await this.usersService.findById(currentUser.sub);
+    if (user === null) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+    const payload: Partial<IUser> = {
+      ...body,
+    };
+    const updatedUser = await this.usersService.updateUser(payload, user.email);
+    return updatedUser;
+  }
+
+  async changePassword(
+    currentUser: ICurrentUser,
+    body: Partial<IUser>,
+  ): Promise<UpdateResult> {
+    const { newPassword, confirmPassword, OTP } = body;
+    // check if password match
+    if (newPassword !== confirmPassword) {
+      throw new HttpException("password doesn't match", HttpStatus.BAD_REQUEST);
+    }
+    //Get user information
+    const user = await this.usersService.findById(currentUser.sub);
+    if (user === null) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+    // check if otp time has expired
+    if (
+      user.otpExpiresAt !== undefined &&
+      Date.now() > Number(user.otpExpiresAt)
+    ) {
+      throw new HttpException(
+        'Invalid OTP or OTP has expired',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    // check if OTP is the same as the provided OTP
+    if (user.OTP !== OTP) {
+      throw new HttpException('Invalid OTP', HttpStatus.BAD_REQUEST);
+    }
+    //Hash new password
+    const hashPassword = await this.util.generateHash(newPassword);
+    //Update user information with new password
+    const payload: Partial<User> = {
+      passwordDigest: hashPassword,
+    };
+    const updatedUser = await this.usersService.updateUser(payload, user.email);
+    return updatedUser;
+  }
+
+  async changeEmail(
+    currentUser: ICurrentUser,
+    body: Partial<IUser>,
+  ): Promise<UpdateResult> {
+    const { email, OTP } = body;
+    //Get user information
+    const user = await this.usersService.findById(currentUser.sub);
+    if (user === null) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+    // check if otp time has expired
+    if (
+      user.otpExpiresAt !== undefined &&
+      Date.now() > Number(user.otpExpiresAt)
+    ) {
+      throw new HttpException(
+        'Invalid OTP or OTP has expired',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    // check if OTP is the same as the provided OTP
+    if (user.OTP !== OTP) {
+      throw new HttpException('Invalid OTP', HttpStatus.BAD_REQUEST);
+    }
+    //Update user information with new password
+    const payload: Partial<User> = {
+      email: email,
+    };
+    const updatedUser = await this.usersService.updateUser(payload, user.email);
+    return updatedUser;
   }
 }

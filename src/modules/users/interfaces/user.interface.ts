@@ -31,6 +31,6 @@ export interface IUser {
   phoneNumber?: string;
   role?: USER_ROLE;
   voucher?: Voucher;
-  createdAt?: string;
-  updatedAt?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
