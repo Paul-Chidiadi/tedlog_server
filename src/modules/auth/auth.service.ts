@@ -119,29 +119,33 @@ export class AuthService {
     });
 
     //Save student into database
-    // if (sendMail.accepted[0] === email) {
-    const data = await this.usersService.create(createdUser);
-    const filteredData = {
-      ...data,
-      passwordDigest: null,
-      otpExpiresAt: null,
-      OTP: null,
-    };
-    //CHECK IF REFERRALID WAS SENT ALONG BY THIS USER CREATING AN ACCOUNT
-    if (referralId) {
-      const referralUser = await this.usersService.findByReferralId(referralId);
-      if (!referralUser) {
-        throw new HttpException('Invalid referral ID', HttpStatus.BAD_REQUEST);
+    if (sendMail.accepted[0] === email) {
+      const data = await this.usersService.create(createdUser);
+      const filteredData = {
+        ...data,
+        passwordDigest: null,
+        otpExpiresAt: null,
+        OTP: null,
+      };
+      //CHECK IF REFERRALID WAS SENT ALONG BY THIS USER CREATING AN ACCOUNT
+      if (referralId) {
+        const referralUser =
+          await this.usersService.findByReferralId(referralId);
+        if (!referralUser) {
+          throw new HttpException(
+            'Invalid referral ID',
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+        const referralCount = referralUser.referrals + 1;
+        await this.usersService.updateUser(
+          { referrals: referralCount },
+          referralUser.email,
+        );
+        return filteredData;
       }
-      const referralCount = referralUser.referrals + 1;
-      await this.usersService.updateUser(
-        { referrals: referralCount },
-        referralUser.email,
-      );
       return filteredData;
     }
-    return filteredData;
-    // }
   }
 
   async login(email: string, password: string): Promise<ILoginResponse> {
