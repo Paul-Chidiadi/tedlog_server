@@ -74,7 +74,15 @@ export class AuthService {
   }
 
   async signup(body: IUser): Promise<Partial<User>> {
-    const { email, password, role, confirmPassword, name, phoneNumber } = body;
+    const {
+      email,
+      password,
+      role,
+      confirmPassword,
+      name,
+      phoneNumber,
+      referralId,
+    } = body;
     // check if password matches
     if (password !== confirmPassword) {
       throw new HttpException('Passwords Do not match', HttpStatus.BAD_REQUEST);
@@ -91,7 +99,7 @@ export class AuthService {
     const hashedPassword: string = await this.util.generateHash(password);
     // Generate OTP code
     const { OTP, otpExpiresAt } = await this.util.generateOtpCode();
-    const createdStudent: Partial<User> = {
+    const createdUser: Partial<User> = {
       name: name,
       phoneNumber: phoneNumber,
       role: role,
@@ -99,27 +107,41 @@ export class AuthService {
       passwordDigest: hashedPassword,
       OTP: String(OTP),
       otpExpiresAt: String(otpExpiresAt),
+      referralId: String(this.util.generateRandomCode(6, true)),
     };
     // Send email with OTP information
     ////////////////////////////////////////////////////////////////
     const sendMail = await this.emailService.sendOTP({
-      firstName: createdStudent.name,
-      email: createdStudent.email,
-      subject: 'Verify your Theddi Account',
-      OTP: createdStudent.OTP,
+      firstName: createdUser.name,
+      email: createdUser.email,
+      subject: 'Welcome to your Theddi Account',
+      OTP: createdUser.OTP,
     });
 
     //Save student into database
-    if (sendMail.accepted[0] === email) {
-      const data = await this.usersService.create(createdStudent);
-      const filteredData = {
-        ...data,
-        passwordDigest: null,
-        otpExpiresAt: null,
-        OTP: null,
-      };
+    // if (sendMail.accepted[0] === email) {
+    const data = await this.usersService.create(createdUser);
+    const filteredData = {
+      ...data,
+      passwordDigest: null,
+      otpExpiresAt: null,
+      OTP: null,
+    };
+    //CHECK IF REFERRALID WAS SENT ALONG BY THIS USER CREATING AN ACCOUNT
+    if (referralId) {
+      const referralUser = await this.usersService.findByReferralId(referralId);
+      if (!referralUser) {
+        throw new HttpException('Invalid referral ID', HttpStatus.BAD_REQUEST);
+      }
+      const referralCount = referralUser.referrals + 1;
+      await this.usersService.updateUser(
+        { referrals: referralCount },
+        referralUser.email,
+      );
       return filteredData;
     }
+    return filteredData;
+    // }
   }
 
   async login(email: string, password: string): Promise<ILoginResponse> {

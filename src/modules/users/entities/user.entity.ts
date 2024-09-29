@@ -37,6 +37,12 @@ export class User {
   @Column({ length: 20, nullable: true })
   phoneNumber: string;
 
+  @Column({ nullable: true })
+  referralId: string;
+
+  @Column({ default: 0, nullable: true })
+  referrals: number;
+
   @Column({
     type: 'enum',
     enum: ['driver', 'consignor', 'consignee', 'admin'],

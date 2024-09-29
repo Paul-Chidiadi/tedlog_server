@@ -31,6 +31,10 @@ export class UsersService {
     return await this.userRepository.findOne({ where: { email } });
   }
 
+  async findByReferralId(referralId: string): Promise<User | undefined> {
+    return await this.userRepository.findOne({ where: { referralId } });
+  }
+
   async findById(userId: string): Promise<User | undefined> {
     return await this.userRepository.findOne({
       where: { id: userId },

@@ -29,6 +29,7 @@ export interface IUser {
   otpExpiresAt?: string;
   email?: string;
   phoneNumber?: string;
+  referralId?: string;
   role?: USER_ROLE;
   voucher?: Voucher;
   createdAt?: Date;
