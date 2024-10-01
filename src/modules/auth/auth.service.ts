@@ -111,7 +111,7 @@ export class AuthService {
     };
     // Send email with OTP information
     ////////////////////////////////////////////////////////////////
-    const sendMail = await this.emailService.sendOTP({
+    const sendMail = await this.emailService.accountActivationMail({
       firstName: createdUser.name,
       email: createdUser.email,
       subject: 'Welcome to your Theddi Account',
