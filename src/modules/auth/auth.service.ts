@@ -79,7 +79,8 @@ export class AuthService {
       password,
       role,
       confirmPassword,
-      name,
+      firstName,
+      lastName,
       phoneNumber,
       referralId,
     } = body;
@@ -100,7 +101,7 @@ export class AuthService {
     // Generate OTP code
     const { OTP, otpExpiresAt } = await this.util.generateOtpCode();
     const createdUser: Partial<User> = {
-      name: name,
+      name: `${firstName} ${lastName}`,
       phoneNumber: phoneNumber,
       role: role,
       email,

@@ -21,7 +21,8 @@ export interface ICurrentUser {
 
 export interface IUser {
   id?: string;
-  name?: string;
+  firstName?: string;
+  lastName?: string;
   password?: string;
   confirmPassword?: string;
   newPassword?: string;
