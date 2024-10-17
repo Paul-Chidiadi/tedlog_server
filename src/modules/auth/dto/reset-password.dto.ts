@@ -12,8 +12,4 @@ export class ResetPasswordDto {
   @IsEmail()
   @IsString()
   email: string;
-
-  @IsString()
-  @IsNotEmpty()
-  OTP: string;
 }

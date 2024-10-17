@@ -20,6 +20,7 @@ import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { AuthGuard } from 'src/common/guards/auth.guard';
 import { CurrentUser } from 'src/common/decorator/current-user.decorator';
 import { ICurrentUser } from '../users/interfaces/user.interface';
+import { ValidateOTPDto } from './dto/validateOTP.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -67,7 +68,7 @@ export class AuthController {
   }
 
   @Post('resendOTP')
-  async resendOTP(@Body() body: Partial<CreateUserDto>, @Res() response) {
+  async resendOTP(@Body() body: Partial<ValidateOTPDto>, @Res() response) {
     const updatedResult = await this.authService.resendOTP(body.email);
     if (updatedResult) {
       return CreateSuccessResponse(
@@ -80,6 +81,15 @@ export class AuthController {
       'Unable to Resend OTP. Please try again later!',
       HttpStatus.INTERNAL_SERVER_ERROR,
     );
+  }
+
+  @Post('validateOTP')
+  async validateOTP(@Body() body: Partial<ValidateOTPDto>, @Res() response) {
+    const user = await this.authService.validateOTP(body.email, body.OTP);
+    if (user) {
+      return CreateSuccessResponse(response, user, 'OTP Succesfully validated');
+    }
+    throw new HttpException('OTP not Valid!', HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
   @Post('forgotPassword')

@@ -184,6 +184,36 @@ export class AuthService {
     };
   }
 
+  async validateOTP(email: string, OTP: string): Promise<Partial<User>> {
+    //Get user information
+    const user = await this.usersService.findByEmail(email);
+
+    if (user === null) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+    // check if otp time has expired
+    if (
+      user.otpExpiresAt !== undefined &&
+      Date.now() > Number(user.otpExpiresAt)
+    ) {
+      throw new HttpException(
+        'Invalid OTP or OTP has expired',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    // check if OTP is the same as the provided OTP
+    if (user.OTP !== OTP) {
+      throw new HttpException('Invalid OTP', HttpStatus.BAD_REQUEST);
+    }
+    const newUser = {
+      ...user,
+      passwordDigest: null,
+      otpExpiresAt: null,
+      OTP: null,
+    };
+    return newUser;
+  }
+
   async resendOTP(email: string): Promise<UpdateResult> {
     //Get user information
     const user = await this.usersService.findByEmail(email);
@@ -238,7 +268,7 @@ export class AuthService {
   }
 
   async resetPassword(body: IUser): Promise<UpdateResult> {
-    const { confirmPassword, newPassword, OTP, email } = body;
+    const { confirmPassword, newPassword, email } = body;
     // check if password match
     if (newPassword !== confirmPassword) {
       throw new HttpException("password doesn't match", HttpStatus.BAD_REQUEST);
@@ -247,20 +277,6 @@ export class AuthService {
     const user = await this.usersService.findByEmail(email);
     if (user === null) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
-    }
-    // check if otp time has expired
-    if (
-      user.otpExpiresAt !== undefined &&
-      Date.now() > Number(user.otpExpiresAt)
-    ) {
-      throw new HttpException(
-        'Invalid OTP or OTP has expired',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-    // check if OTP is the same as the provided OTP
-    if (user.OTP !== OTP) {
-      throw new HttpException('Invalid OTP', HttpStatus.BAD_REQUEST);
     }
     //Hash new password
     const hashPassword = await this.util.generateHash(newPassword);
