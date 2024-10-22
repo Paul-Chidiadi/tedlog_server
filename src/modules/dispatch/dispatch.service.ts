@@ -8,6 +8,7 @@ import { DISPATCH_STATUS } from 'src/common/enums/dispatch.enum';
 import { Repository, UpdateResult } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Voucher } from './entities/voucher.entity';
+import { PaymentsService } from '../payments/payments.service';
 
 @Injectable()
 export class DispatchService {
@@ -18,8 +19,10 @@ export class DispatchService {
     private readonly voucherRepository: Repository<Voucher>,
 
     private readonly usersService: UsersService,
+    private readonly paymentsService: PaymentsService,
     private readonly util: Utilities,
   ) {}
+
   async sendDispatch(
     body: IDispatch,
     currentUser: ICurrentUser,
@@ -75,11 +78,22 @@ export class DispatchService {
         await this.voucherRepository.remove(voucherData);
         return dispatch;
       }
-      //Deduct wallet balance if user paid with his wallet
-      const walletPayload = {
-        walletBalance: usersBalance - Number(cost),
+
+      //Deduct/update wallet balance if user paid with his wallet
+      const payloadUpdate: any = {
+        amount: cost,
+        email: userData.email,
+        transactionId: dispatchId,
+        paymentDate: Date.now().toString(),
+        transactType: 'debit',
       };
-      await this.usersService.updateUser(walletPayload, userData.email);
+      const transactUpdate =
+        await this.paymentsService.updateTransactionData(payloadUpdate);
+
+      // const walletPayload = {
+      //   walletBalance: usersBalance - Number(cost),
+      // };
+      // await this.usersService.updateUser(walletPayload, userData.email);
       return dispatch;
     } else
       throw new HttpException(

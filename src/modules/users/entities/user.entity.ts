@@ -2,6 +2,7 @@ import { Exclude } from 'class-transformer';
 import { USER_ROLE } from 'src/common/enums/user.enum';
 import { Dispatch } from 'src/modules/dispatch/entities/dispatch.entity';
 import { Voucher } from 'src/modules/dispatch/entities/voucher.entity';
+import { Payment } from 'src/modules/payments/entities/payments.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -61,11 +62,19 @@ export class User {
 
   @OneToMany(() => Dispatch, (dispatch) => dispatch.user, {
     cascade: true,
+    eager: true,
   })
   dispatches: Dispatch[];
 
+  @OneToMany(() => Payment, (payment) => payment.user, {
+    cascade: true,
+    eager: true,
+  })
+  payments: Payment[];
+
   @OneToMany(() => Voucher, (voucher) => voucher.user, {
     cascade: true,
+    eager: true,
   })
   vouchers: Voucher[];
 }

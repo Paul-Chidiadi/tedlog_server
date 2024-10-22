@@ -44,3 +44,8 @@ export const awsConfig = {
   AWS_REGION: process.env.AWS_REGION,
   BUCKET_NAME: process.env.BUCKET_NAME,
 };
+
+export const paystackConfig = {
+  PAYSTACK_SECRET_KEY: process.env.PAYSTACK_SECRET_KEY,
+  PAYSTACK_BASE_URL: process.env.PAYSTACK_BASE_URL,
+};

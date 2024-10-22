@@ -21,13 +21,17 @@ import { AuthGuard } from 'src/common/guards/auth.guard';
 import { CurrentUser } from 'src/common/decorator/current-user.decorator';
 import { ICurrentUser } from '../users/interfaces/user.interface';
 import { ValidateOTPDto } from './dto/validateOTP.dto';
+import { Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('signup')
-  async signup(@Body() createUserDto: CreateUserDto, @Res() response) {
+  async signup(
+    @Body() createUserDto: CreateUserDto,
+    @Res() response: Response,
+  ) {
     const user = await this.authService.signup(createUserDto);
     if (user) {
       return CreateSuccessResponse(response, user, 'Registration Successfull');
@@ -68,7 +72,10 @@ export class AuthController {
   }
 
   @Post('resendOTP')
-  async resendOTP(@Body() body: Partial<ValidateOTPDto>, @Res() response) {
+  async resendOTP(
+    @Body() body: Partial<ValidateOTPDto>,
+    @Res() response: Response,
+  ) {
     const updatedResult = await this.authService.resendOTP(body.email);
     if (updatedResult) {
       return CreateSuccessResponse(
@@ -84,7 +91,10 @@ export class AuthController {
   }
 
   @Post('validateOTP')
-  async validateOTP(@Body() body: Partial<ValidateOTPDto>, @Res() response) {
+  async validateOTP(
+    @Body() body: Partial<ValidateOTPDto>,
+    @Res() response: Response,
+  ) {
     const user = await this.authService.validateOTP(body.email, body.OTP);
     if (user) {
       return CreateSuccessResponse(response, user, 'OTP Succesfully validated');
@@ -95,7 +105,7 @@ export class AuthController {
   @Post('forgotPassword')
   async forgotPassword(
     @Body() forgotPasswordDto: ForgotPasswordDto,
-    @Res() response,
+    @Res() response: Response,
   ) {
     const updatedResult = await this.authService.forgotPassword(
       forgotPasswordDto.email,
@@ -116,7 +126,7 @@ export class AuthController {
   @Patch('resetPassword')
   async resetPassword(
     @Body() resetPasswordDto: ResetPasswordDto,
-    @Res() response,
+    @Res() response: Response,
   ) {
     const updatedResult =
       await this.authService.resetPassword(resetPasswordDto);
@@ -170,7 +180,7 @@ export class AuthController {
   async editProfile(
     @Body() body: Partial<CreateUserDto>,
     @CurrentUser() currentUser: ICurrentUser,
-    @Res() response,
+    @Res() response: Response,
   ) {
     const updatedResult = await this.authService.editProfile(currentUser, body);
     if (updatedResult) {
@@ -191,7 +201,7 @@ export class AuthController {
   async changePassword(
     @Body() body: Partial<CreateUserDto>,
     @CurrentUser() currentUser: ICurrentUser,
-    @Res() response,
+    @Res() response: Response,
   ) {
     const updatedResult = await this.authService.changePassword(
       currentUser,
@@ -215,7 +225,7 @@ export class AuthController {
   async changeEmail(
     @Body() body: Partial<CreateUserDto>,
     @CurrentUser() currentUser: ICurrentUser,
-    @Res() response,
+    @Res() response: Response,
   ) {
     const updatedResult = await this.authService.changeEmail(currentUser, body);
     if (updatedResult) {
