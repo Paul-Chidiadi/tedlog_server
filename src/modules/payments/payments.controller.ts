@@ -1,7 +1,10 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
+  HttpException,
+  HttpStatus,
   Post,
   Req,
   Res,
@@ -15,10 +18,27 @@ import { paystackConfig } from 'src/common/config/env.config';
 import { CurrentUser } from 'src/common/decorator/current-user.decorator';
 import { ICurrentUser } from '../users/interfaces/user.interface';
 import { CreateSuccessResponse } from 'src/common/utils/response.utils';
+import { USER_ROLE } from 'src/common/enums/user.enum';
+import { RolesGuard } from 'src/common/guards/roles.guard';
+import { Roles } from 'src/common/decorator/roles.decorator';
 
 @Controller('payments')
 export class PaymentsController {
   constructor(private readonly paymentsService: PaymentsService) {}
+
+  @Roles(USER_ROLE.ADMIN)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Get('')
+  async getAllPayments(@Res() response) {
+    const data = await this.paymentsService.getAllPayments();
+    if (data) {
+      return CreateSuccessResponse(response, data, 'Successfull');
+    }
+    throw new HttpException(
+      'Unable to Get All Payments. Please try again later!',
+      HttpStatus.INTERNAL_SERVER_ERROR,
+    );
+  }
 
   // Endpoint to initialize payment
   @UseGuards(AuthGuard)

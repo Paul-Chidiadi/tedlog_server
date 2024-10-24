@@ -16,6 +16,11 @@ export class PaymentsService {
     private readonly usersService: UsersService,
   ) {}
 
+  async getAllPayments(): Promise<Payment[]> {
+    const paymentsData = await this.paymentRepository.find();
+    return paymentsData;
+  }
+
   async initializePayment(
     email: string,
     amount: number,

@@ -57,7 +57,7 @@ export class DispatchController {
 
   @Roles(USER_ROLE.ADMIN)
   @UseGuards(AuthGuard, RolesGuard)
-  @Get('getAllDisatch')
+  @Get('getAllDispatch')
   async getAllDispatch(@Res() response) {
     const data = await this.dispatchService.getAllDispatch();
     if (data) {
