@@ -7,6 +7,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Res,
   UseGuards,
 } from '@nestjs/common';
@@ -20,6 +21,7 @@ import { SendDispatchDto } from './dto/send-dispatch.dto';
 import { CurrentUser } from 'src/common/decorator/current-user.decorator';
 import { ICurrentUser } from '../users/interfaces/user.interface';
 import { UpdateDispatchDto } from './dto/update-dispatch.dto';
+import { log } from 'console';
 
 @Controller('dispatch')
 export class DispatchController {
@@ -58,14 +60,47 @@ export class DispatchController {
   @Roles(USER_ROLE.ADMIN)
   @UseGuards(AuthGuard, RolesGuard)
   @Get('getAllDispatch')
-  async getAllDispatch(@Res() response) {
-    const data = await this.dispatchService.getAllDispatch();
+  async getAllDispatch(@Query() queryParams: any, @Res() response) {
+    const data = await this.dispatchService.getAllDispatch(queryParams);
     if (data) {
       return CreateSuccessResponse(response, data, 'Successfull');
     }
     throw new HttpException(
       'Unable to Get All Dispatch. Please try again later!',
       HttpStatus.INTERNAL_SERVER_ERROR,
+    );
+  }
+
+  @Roles(USER_ROLE.ADMIN)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Get('/getAllDispatch/search')
+  async searchDispatches(@Query('query') query: string) {
+    const searchDispatch = await this.dispatchService.searchDispatches(query);
+    if (searchDispatch) {
+      return searchDispatch;
+    }
+    throw new HttpException(
+      'Unable to Search Dispatches. Please try again later!',
+      HttpStatus.INTERNAL_SERVER_ERROR,
+    );
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('/getAllDispatch/:userId/search')
+  async searchUserDispatches(
+    @Param('userId') userId: string,
+    @Query('query') query: string,
+  ) {
+    const searchDispatch = await this.dispatchService.searchUserDispatches(
+      userId,
+      query,
+    );
+    if (searchDispatch) {
+      return searchDispatch;
+    }
+    throw new HttpException(
+      'No dispatches found for the given user and search query!',
+      HttpStatus.NOT_FOUND,
     );
   }
 

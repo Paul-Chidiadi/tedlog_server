@@ -21,10 +21,28 @@ export class UsersService {
     const savedResult = await this.userRepository.save(createUser);
     return savedResult;
   }
+
   async findAll(): Promise<User[]> {
     return await this.userRepository.find({
       relations: ['vouchers', 'dispatches'],
     });
+  }
+
+  async searchUsers(searchString: string): Promise<User[]> {
+    const searchRegex = `%${searchString}%`; // SQL LIKE pattern for partial matching
+    const searchUser = await this.userRepository
+      .createQueryBuilder('users')
+      .where('users.name LIKE :searchRegex', { searchRegex })
+      .orWhere('users.email LIKE :searchRegex', {
+        searchRegex,
+      })
+      .orWhere('users.phoneNumber LIKE :searchRegex', {
+        searchRegex,
+      })
+      .orWhere('users.referralId LIKE :searchRegex', { searchRegex })
+      .orWhere('users.walletBalance LIKE :searchRegex', { searchRegex })
+      .getMany();
+    return searchUser;
   }
 
   async findByEmail(email: string): Promise<User | undefined> {
@@ -40,6 +58,33 @@ export class UsersService {
       where: { id: userId },
       relations: ['vouchers', 'dispatches'],
     });
+  }
+
+  async findUserById(
+    userId: string,
+    queryParams: any,
+  ): Promise<User | undefined> {
+    // Create the base query to fetch the user with related vouchers and dispatches
+    const queryBuilder = this.userRepository
+      .createQueryBuilder('users')
+      .leftJoinAndSelect('users.vouchers', 'vouchers')
+      .leftJoinAndSelect('users.payments', 'payments')
+      .leftJoinAndSelect('users.dispatches', 'dispatches'); // Join related dispatches
+
+    // Filter the user by their ID
+    queryBuilder.where('users.id = :userId', { userId });
+
+    // Apply filters on dispatches based on queryParams
+    if (queryParams.status) {
+      // Check if the dispatches relation exists before applying the status filter
+      queryBuilder.andWhere(
+        '(dispatches.status = :status OR dispatches.id IS NULL)',
+        { status: queryParams.status },
+      );
+    }
+
+    // Fetch the user with the applied filters
+    return queryBuilder.getOne();
   }
 
   async findByEmailAndOtp(

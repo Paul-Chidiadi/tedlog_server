@@ -5,6 +5,7 @@ import {
   HttpException,
   HttpStatus,
   Post,
+  Query,
   Res,
   UseGuards,
 } from '@nestjs/common';
@@ -34,6 +35,20 @@ export class AdminController {
     }
     throw new HttpException(
       'Unable to Get All User. Please try again later!',
+      HttpStatus.INTERNAL_SERVER_ERROR,
+    );
+  }
+
+  @Roles(USER_ROLE.ADMIN)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Get('/getAllUsers/search')
+  async searchDispatches(@Query('query') query: string) {
+    const searchUser = await this.usersService.searchUsers(query);
+    if (searchUser) {
+      return searchUser;
+    }
+    throw new HttpException(
+      'Unable to Search Users. Please try again later!',
       HttpStatus.INTERNAL_SERVER_ERROR,
     );
   }

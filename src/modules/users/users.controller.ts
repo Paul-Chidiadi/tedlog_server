@@ -4,6 +4,7 @@ import {
   HttpException,
   HttpStatus,
   Param,
+  Query,
   Res,
   UseGuards,
 } from '@nestjs/common';
@@ -23,8 +24,13 @@ export class UsersController {
   @Roles(USER_ROLE.ADMIN, USER_ROLE.CONSIGNOR)
   @UseGuards(AuthGuard, RolesGuard)
   @Get('/:id')
-  async getUser(@Param('id') id: string, @Res() response) {
-    const user = await this.usersService.findById(id);
+  async getUser(
+    @Param('id') id: string,
+    @Query() queryParams: any,
+    @Res() response,
+  ) {
+    const user = await this.usersService.findUserById(id, queryParams);
+
     if (user) {
       return CreateSuccessResponse(response, user, 'Successfull');
     }

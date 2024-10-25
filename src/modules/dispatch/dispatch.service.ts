@@ -5,7 +5,7 @@ import { Dispatch } from './entities/dispatch.entity';
 import { UsersService } from '../users/users.service';
 import { Utilities } from 'src/common/utils/utils.service';
 import { DISPATCH_STATUS } from 'src/common/enums/dispatch.enum';
-import { Repository, UpdateResult } from 'typeorm';
+import { Brackets, Repository, UpdateResult } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Voucher } from './entities/voucher.entity';
 import { PaymentsService } from '../payments/payments.service';
@@ -110,11 +110,78 @@ export class DispatchService {
     return dispatchData;
   }
 
-  async getAllDispatch(): Promise<Dispatch[]> {
-    const dispatchData = await this.dispatchRepository.find({
-      relations: ['user'],
-    });
-    return dispatchData;
+  async getAllDispatch(queryParams: any): Promise<Dispatch[]> {
+    const queryBuilder = this.dispatchRepository
+      .createQueryBuilder('dispatches')
+      .leftJoinAndSelect('dispatches.user', 'user');
+    // Dynamically add filters based on the presence of query parameters
+    if (queryParams.status) {
+      queryBuilder.andWhere('dispatches.status = :status', {
+        status: queryParams.status,
+      });
+    }
+    // If no filters are applied, this will return all dispatches
+    return queryBuilder.getMany();
+  }
+
+  async searchDispatches(searchString: string): Promise<Dispatch[]> {
+    const searchRegex = `%${searchString}%`; // SQL LIKE pattern for partial matching
+    const searchDispatch = await this.dispatchRepository
+      .createQueryBuilder('dispatches')
+      .where('dispatches.dispatchId LIKE :searchRegex', { searchRegex })
+      .orWhere('dispatches.consignorLocation LIKE :searchRegex', {
+        searchRegex,
+      })
+      .orWhere('dispatches.consigneeLocation LIKE :searchRegex', {
+        searchRegex,
+      })
+      .orWhere('dispatches.consigneeName LIKE :searchRegex', { searchRegex })
+      .orWhere('dispatches.consignorName LIKE :searchRegex', { searchRegex })
+      .orWhere('dispatches.dateDelivered LIKE :searchRegex', {
+        searchRegex,
+      })
+      .orWhere('dispatches.productType LIKE :searchRegex', { searchRegex })
+      .getMany();
+    return searchDispatch;
+  }
+
+  async searchUserDispatches(
+    userId: string,
+    searchString: string,
+  ): Promise<Dispatch[]> {
+    const searchRegex = `%${searchString}%`; // SQL LIKE pattern for partial matching
+
+    // Create the query to filter dispatches by user and apply the search string
+    const searchDispatch = await this.dispatchRepository
+      .createQueryBuilder('dispatches')
+      .leftJoinAndSelect('dispatches.user', 'user') // Join the user relation
+      .where('user.id = :userId', { userId }) // Filter by userId
+      .andWhere(
+        new Brackets((qb) => {
+          qb.where('dispatches.dispatchId LIKE :searchRegex', { searchRegex })
+            .orWhere('dispatches.consignorLocation LIKE :searchRegex', {
+              searchRegex,
+            })
+            .orWhere('dispatches.consigneeLocation LIKE :searchRegex', {
+              searchRegex,
+            })
+            .orWhere('dispatches.consigneeName LIKE :searchRegex', {
+              searchRegex,
+            })
+            .orWhere('dispatches.consignorName LIKE :searchRegex', {
+              searchRegex,
+            })
+            .orWhere('dispatches.dateDelivered LIKE :searchRegex', {
+              searchRegex,
+            })
+            .orWhere('dispatches.productType LIKE :searchRegex', {
+              searchRegex,
+            });
+        }),
+      )
+      .getMany();
+
+    return searchDispatch;
   }
 
   async updateDispatch(
