@@ -21,7 +21,7 @@ import { SendDispatchDto } from './dto/send-dispatch.dto';
 import { CurrentUser } from 'src/common/decorator/current-user.decorator';
 import { ICurrentUser } from '../users/interfaces/user.interface';
 import { UpdateDispatchDto } from './dto/update-dispatch.dto';
-import { log } from 'console';
+import { Response } from 'express';
 
 @Controller('dispatch')
 export class DispatchController {
@@ -33,7 +33,7 @@ export class DispatchController {
   async sendDispatch(
     @Body() body: SendDispatchDto,
     @CurrentUser() currentUser: ICurrentUser,
-    @Res() response,
+    @Res() response: Response,
   ) {
     const data = await this.dispatchService.sendDispatch(body, currentUser);
     if (data) {
@@ -46,7 +46,7 @@ export class DispatchController {
   }
 
   @Get('getDispatch/:id')
-  async getDispatch(@Param('id') id: string, @Res() response) {
+  async getDispatch(@Param('id') id: string, @Res() response: Response) {
     const data = await this.dispatchService.getDispatch(id);
     if (data) {
       return CreateSuccessResponse(response, data, 'Successfull');
@@ -60,7 +60,7 @@ export class DispatchController {
   @Roles(USER_ROLE.ADMIN)
   @UseGuards(AuthGuard, RolesGuard)
   @Get('getAllDispatch')
-  async getAllDispatch(@Query() queryParams: any, @Res() response) {
+  async getAllDispatch(@Query() queryParams: any, @Res() response: Response) {
     const data = await this.dispatchService.getAllDispatch(queryParams);
     if (data) {
       return CreateSuccessResponse(response, data, 'Successfull');
@@ -109,7 +109,7 @@ export class DispatchController {
   async updateDispatch(
     @Body() body: UpdateDispatchDto,
     @Param('id') id: string,
-    @Res() response,
+    @Res() response: Response,
   ) {
     const data = await this.dispatchService.updateDispatch(body, id);
     if (data) {

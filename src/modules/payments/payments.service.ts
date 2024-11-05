@@ -74,18 +74,15 @@ export class PaymentsService {
     };
     const usersBalance = Number(user.walletBalance);
     const newBalance =
-      transactType === 'credit'
-        ? usersBalance + Number(amount)
-        : usersBalance - Number(amount);
+      transactType === 'credit' ? usersBalance + Number(amount) : usersBalance;
     const userData = {
       walletBalance: newBalance,
     };
     const paymentData = await this.paymentRepository.save(transactionData);
     //UPDATE USERS WALLET
-    const updateUserWallet = await this.usersService.updateUser(
-      userData,
-      email,
-    );
+    const updateUserWallet =
+      transactType === 'credit' &&
+      (await this.usersService.updateUser(userData, email));
     return paymentData;
   }
 

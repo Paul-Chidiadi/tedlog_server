@@ -17,6 +17,7 @@ import { AuthGuard } from 'src/common/guards/auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { CreateSuccessResponse } from 'src/common/utils/response.utils';
 import { createVoucherDto } from './dto/create-voucher.dto';
+import { Response } from 'express';
 
 @Controller('admin')
 export class AdminController {
@@ -56,7 +57,10 @@ export class AdminController {
   @Roles(USER_ROLE.ADMIN)
   @UseGuards(AuthGuard, RolesGuard)
   @Post('createVoucher')
-  async createVoucher(@Body() body: createVoucherDto, @Res() response) {
+  async createVoucher(
+    @Body() body: createVoucherDto,
+    @Res() response: Response,
+  ) {
     const voucher = await this.adminService.createVoucher(body);
     if (voucher) {
       return CreateSuccessResponse(

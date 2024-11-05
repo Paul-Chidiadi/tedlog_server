@@ -16,6 +16,10 @@ export class SendDispatchDto {
 
   @IsString()
   @IsNotEmpty()
+  consignorAddress: string;
+
+  @IsString()
+  @IsNotEmpty()
   consigneeLocation: string;
 
   @IsString()
@@ -25,6 +29,10 @@ export class SendDispatchDto {
   @IsString()
   @IsNotEmpty()
   consigneeContact: string;
+
+  @IsString()
+  @IsNotEmpty()
+  consigneeAddress: string;
 
   @IsString()
   @IsNotEmpty()

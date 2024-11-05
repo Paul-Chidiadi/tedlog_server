@@ -26,6 +26,9 @@ export class Dispatch {
   @Column({ length: 200 })
   consignorLocation: string;
 
+  @Column({ length: 200 })
+  consignorAddress: string;
+
   @Column({ length: 50 })
   consignorName: string;
 
@@ -34,6 +37,9 @@ export class Dispatch {
 
   @Column({ length: 200 })
   consigneeLocation: string;
+
+  @Column({ length: 200 })
+  consigneeAddress: string;
 
   @Column({ length: 50 })
   consigneeName: string;

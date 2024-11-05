@@ -16,6 +16,7 @@ import { USER_ROLE } from 'src/common/enums/user.enum';
 import { AuthGuard } from 'src/common/guards/auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorator/roles.decorator';
+import { Response } from 'express';
 
 @Controller('users')
 export class UsersController {
@@ -27,7 +28,7 @@ export class UsersController {
   async getUser(
     @Param('id') id: string,
     @Query() queryParams: any,
-    @Res() response,
+    @Res() response: Response,
   ) {
     const user = await this.usersService.findUserById(id, queryParams);
 
@@ -45,7 +46,7 @@ export class UsersController {
   @Get('vouchers')
   async getUserVouchers(
     @CurrentUser() currentUser: ICurrentUser,
-    @Res() response,
+    @Res() response: Response,
   ) {
     const userWithVouchers = await this.usersService.findUserVouchers(
       currentUser.sub,

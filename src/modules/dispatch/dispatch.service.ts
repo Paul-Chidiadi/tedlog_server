@@ -30,9 +30,11 @@ export class DispatchService {
     const {
       consigneeContact,
       consigneeLocation,
+      consigneeAddress,
       consigneeName,
       consignorContact,
       consignorLocation,
+      consignorAddress,
       consignorName,
       productType,
       weight,
@@ -43,26 +45,25 @@ export class DispatchService {
 
     const userData = await this.usersService.findById(currentUser.sub);
     const voucherData = await this.voucherRepository.findOneBy({ id: voucher });
-    if (!voucherData) {
-      throw new HttpException(
-        'Invalid Voucher, Please fund your wallet',
-        HttpStatus.BAD_REQUEST,
-      );
+    if (voucher && !voucherData) {
+      throw new HttpException('Invalid Voucher', HttpStatus.BAD_REQUEST);
     }
 
     const usersBalance = Number(userData.walletBalance);
-    const voucherValue = Number(voucherData.value);
-    if (
-      usersBalance >= Number(cost) ||
-      (voucher && userData.vouchers.length > 0 && voucherValue >= Number(cost))
-    ) {
+    const voucherValue = voucher ? Number(voucherData.value) : 0;
+    //ADD VOUCHER VALUE TO SEE IF IT CAN REACH
+    const balancePlusVoucher = usersBalance + voucherValue;
+
+    if (balancePlusVoucher >= Number(cost)) {
       const dispatchId = `TEDLOG::${this.util.generateRandomCode(6, false)}`;
       const payload: Partial<Dispatch> = {
         consigneeContact,
         consigneeLocation,
+        consigneeAddress,
         consigneeName,
         consignorContact,
         consignorLocation,
+        consignorAddress,
         consignorName,
         productType,
         weight,
@@ -90,16 +91,18 @@ export class DispatchService {
       const transactUpdate =
         await this.paymentsService.updateTransactionData(payloadUpdate);
 
-      // const walletPayload = {
-      //   walletBalance: usersBalance - Number(cost),
-      // };
-      // await this.usersService.updateUser(walletPayload, userData.email);
+      const walletPayload = {
+        walletBalance: voucher
+          ? usersBalance - (Number(cost) - Number(voucherData.value))
+          : usersBalance - Number(cost),
+      };
+      await this.usersService.updateUser(walletPayload, userData.email);
       return dispatch;
-    } else
-      throw new HttpException(
-        'Insufficeint funds, Please fund your wallet',
-        HttpStatus.BAD_REQUEST,
-      );
+    }
+    throw new HttpException(
+      'Insufficeint funds, Please fund your wallet',
+      HttpStatus.BAD_REQUEST,
+    );
   }
 
   async getDispatch(id: string): Promise<Dispatch> {

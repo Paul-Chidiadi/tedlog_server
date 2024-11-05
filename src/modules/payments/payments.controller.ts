@@ -29,7 +29,7 @@ export class PaymentsController {
   @Roles(USER_ROLE.ADMIN)
   @UseGuards(AuthGuard, RolesGuard)
   @Get('')
-  async getAllPayments(@Res() response) {
+  async getAllPayments(@Res() response: Response) {
     const data = await this.paymentsService.getAllPayments();
     if (data) {
       return CreateSuccessResponse(response, data, 'Successfull');
