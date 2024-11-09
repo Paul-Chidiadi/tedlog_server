@@ -36,7 +36,7 @@ export class UsersController {
       return CreateSuccessResponse(response, user, 'Successfull');
     }
     throw new HttpException(
-      'Unable to Get User. Please try again later!',
+      'No Data Available. Please try again later!',
       HttpStatus.INTERNAL_SERVER_ERROR,
     );
   }

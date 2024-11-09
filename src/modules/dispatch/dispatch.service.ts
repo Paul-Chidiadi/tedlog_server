@@ -3,7 +3,7 @@ import { ICurrentUser } from '../users/interfaces/user.interface';
 import { IDispatch } from './interfaces/dispatch.interface';
 import { Dispatch } from './entities/dispatch.entity';
 import { UsersService } from '../users/users.service';
-import { Utilities } from 'src/common/utils/utils.service';
+import { Utilities, getDateString } from 'src/common/utils/utils.service';
 import { DISPATCH_STATUS } from 'src/common/enums/dispatch.enum';
 import { Brackets, Repository, UpdateResult } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -85,7 +85,7 @@ export class DispatchService {
         amount: cost,
         email: userData.email,
         transactionId: dispatchId,
-        paymentDate: Date.now().toString(),
+        paymentDate: getDateString(),
         transactType: 'debit',
       };
       const transactUpdate =

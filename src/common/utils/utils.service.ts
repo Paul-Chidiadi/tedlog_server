@@ -90,6 +90,15 @@ export class Utilities {
   }
 }
 
+export const getDateString = () => {
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
+};
+
 export function processFile(req: any, file: any) {
   const filePath = `https://${req.get('host')}/api/v1/public/files/${file.filename}`;
   return filePath;
