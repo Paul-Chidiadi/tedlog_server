@@ -22,8 +22,7 @@ import { Response } from 'express';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Roles(USER_ROLE.ADMIN, USER_ROLE.CONSIGNOR)
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard)
   @Get('/:id')
   async getUser(
     @Param('id') id: string,

@@ -57,7 +57,7 @@ export class DispatchController {
     );
   }
 
-  @Roles(USER_ROLE.ADMIN)
+  @Roles(USER_ROLE.ADMIN, USER_ROLE.DRIVER)
   @UseGuards(AuthGuard, RolesGuard)
   @Get('getAllDispatch')
   async getAllDispatch(@Query() queryParams: any, @Res() response: Response) {
@@ -71,7 +71,7 @@ export class DispatchController {
     );
   }
 
-  @Roles(USER_ROLE.ADMIN)
+  @Roles(USER_ROLE.ADMIN, USER_ROLE.DRIVER)
   @UseGuards(AuthGuard, RolesGuard)
   @Get('/getAllDispatch/search')
   async searchDispatches(@Query('query') query: string) {
