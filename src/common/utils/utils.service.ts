@@ -6,6 +6,7 @@ import { convert } from 'html-to-text';
 import { JwtService } from '@nestjs/jwt';
 import { diskStorage } from 'multer';
 import { VALID_FILE_FORMAT } from '../constants';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class Utilities {
@@ -119,3 +120,14 @@ export const storageConfig = diskStorage({
     cb(null, fileName);
   },
 });
+
+// Generate a random string of given length
+export function generateRandomString(length: number): string {
+  return crypto.randomBytes(length).toString('base64').slice(0, length);
+}
+
+// Hash a string securely
+export async function hashString(data: string): Promise<string> {
+  const salt = await bcrypt.genSalt();
+  return bcrypt.hash(data, salt);
+}

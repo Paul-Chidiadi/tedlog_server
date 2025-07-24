@@ -29,7 +29,7 @@ export class AdminController {
   @Roles(USER_ROLE.ADMIN)
   @UseGuards(AuthGuard, RolesGuard)
   @Get('getAllUsers')
-  async getAllUsers(@Res() response) {
+  async getAllUsers(@Res() response: Response) {
     const users = await this.usersService.findAll();
     if (users) {
       return CreateSuccessResponse(response, users, 'Successfull');

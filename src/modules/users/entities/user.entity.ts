@@ -2,6 +2,8 @@ import { Exclude } from 'class-transformer';
 import { USER_ROLE } from 'src/common/enums/user.enum';
 import { Dispatch } from 'src/modules/dispatch/entities/dispatch.entity';
 import { Voucher } from 'src/modules/dispatch/entities/voucher.entity';
+import { Card } from 'src/modules/karthlog/cards/entities/cards.entity';
+import { Transaction } from 'src/modules/karthlog/transactions/entities/transactions.entity';
 import { Payment } from 'src/modules/payments/entities/payments.entity';
 import {
   Entity,
@@ -10,6 +12,8 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 
 @Entity('users')
@@ -77,4 +81,26 @@ export class User {
     eager: true,
   })
   vouchers: Voucher[];
+
+  //KARTHLOG USER DETAILS
+  @Column({ type: 'decimal', scale: 2, default: 0 })
+  cowrieBalance: number;
+
+  @Column({ default: false })
+  karthlogStatus: boolean;
+
+  @Column({ default: true })
+  isActive: boolean;
+
+  @ManyToMany(() => Card, (card) => card.users, {
+    cascade: true,
+  })
+  @JoinTable()
+  cardsOwned: Card[];
+
+  @OneToMany(() => Transaction, (transaction) => transaction.user, {
+    cascade: true,
+    eager: true,
+  })
+  karthlogTransactions: Transaction[];
 }
