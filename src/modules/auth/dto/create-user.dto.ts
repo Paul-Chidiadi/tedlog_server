@@ -15,16 +15,16 @@ export class CreateUserDto {
 
   @IsString()
   @IsNotEmpty()
-  @Matches(PASSWORD_RULE, {
-    message: PASSWORD_RULE_MESSAGE,
-  })
+  // @Matches(PASSWORD_RULE, {
+  //   message: PASSWORD_RULE_MESSAGE,
+  // })
   password: string;
 
   @IsString()
   @IsNotEmpty()
-  @Matches(PASSWORD_RULE, {
-    message: PASSWORD_RULE_MESSAGE,
-  })
+  // @Matches(PASSWORD_RULE, {
+  //   message: PASSWORD_RULE_MESSAGE,
+  // })
   confirmPassword: string;
 
   @IsString()
