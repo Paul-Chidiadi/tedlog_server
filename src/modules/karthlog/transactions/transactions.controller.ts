@@ -39,7 +39,7 @@ export class TransactionsController {
 
   @Roles(USER_ROLE.ADMIN)
   @UseGuards(AuthGuard, RolesGuard)
-  @Get('user/all')
+  @Get('all')
   async getAllTransactions(@Res() response: Response) {
     const data = await this.transactionsService.findAll();
     if (data) {
