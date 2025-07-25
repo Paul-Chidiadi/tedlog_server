@@ -18,6 +18,9 @@ export class Transaction {
   @Column({ length: 100 })
   email: string;
 
+  @Column({ type: 'text' })
+  description: string;
+
   @Column({
     type: 'enum',
     enum: ['debit', 'credit'],

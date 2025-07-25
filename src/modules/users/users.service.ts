@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Repository, UpdateResult } from 'typeorm';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -24,7 +24,12 @@ export class UsersService {
 
   async findAll(): Promise<User[]> {
     return await this.userRepository.find({
-      relations: ['vouchers', 'dispatches'],
+      relations: [
+        'vouchers',
+        'dispatches',
+        'cardsOwned',
+        'karthlogTransactions',
+      ],
     });
   }
 
@@ -63,13 +68,15 @@ export class UsersService {
   async findUserById(
     userId: string,
     queryParams: any,
-  ): Promise<User | undefined> {
+  ): Promise<Partial<User> | undefined> {
     // Create the base query to fetch the user with related vouchers and dispatches
     const queryBuilder = this.userRepository
       .createQueryBuilder('users')
       .leftJoinAndSelect('users.vouchers', 'vouchers')
       .leftJoinAndSelect('users.payments', 'payments')
-      .leftJoinAndSelect('users.dispatches', 'dispatches'); // Join related dispatches
+      .leftJoinAndSelect('users.dispatches', 'dispatches')
+      .leftJoinAndSelect('users.karthlogTransactions', 'karthlogTransactions')
+      .leftJoinAndSelect('users.cardsOwned', 'cardsOwned');
 
     // Filter the user by their ID
     queryBuilder.where('users.id = :userId', { userId });
@@ -84,7 +91,10 @@ export class UsersService {
     }
 
     // Fetch the user with the applied filters
-    return queryBuilder.getOne();
+    const result = await queryBuilder.getOne();
+    const { passwordDigest, OTP, otpExpiresAt, ...userData } = result;
+
+    return userData;
   }
 
   async findByEmailAndOtp(
@@ -99,5 +109,16 @@ export class UsersService {
     email: string,
   ): Promise<UpdateResult> {
     return await this.userRepository.update({ email }, payload);
+  }
+
+  async suspendUser(id: string): Promise<UpdateResult> {
+    const existingUser = await this.findById(id);
+    if (!existingUser) {
+      throw new BadRequestException('User not found');
+    }
+    return await this.userRepository.update(
+      { id: id },
+      { isActive: existingUser.isActive ? false : true },
+    );
   }
 }

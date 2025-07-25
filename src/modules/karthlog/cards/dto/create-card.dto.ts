@@ -22,7 +22,7 @@ export class CreateCardDto {
 
   @IsEnum(CARD_TYPE)
   @IsNotEmpty()
-  cowrieAmotype: CARD_TYPE;
+  type: CARD_TYPE;
 
   @IsString()
   @IsNotEmpty()

@@ -136,6 +136,7 @@ export class CardsService {
     // 5. Create transaction history
     const transaction = this.transactionRepository.create({
       email: user.email,
+      description: 'Received from card linking',
       transactionType: TRANSACTION_TYPE.CREDIT,
       paymentDate: new Date().toISOString(),
       amount: amountToCredit,

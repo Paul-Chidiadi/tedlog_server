@@ -4,6 +4,7 @@ import {
   HttpException,
   HttpStatus,
   Param,
+  Patch,
   Query,
   Res,
   UseGuards,
@@ -32,10 +33,25 @@ export class UsersController {
     const user = await this.usersService.findUserById(id, queryParams);
 
     if (user) {
-      return CreateSuccessResponse(response, user, 'Successfull');
+      return CreateSuccessResponse(response, user, 'Successful');
     }
     throw new HttpException(
       'No Data Available. Please try again later!',
+      HttpStatus.INTERNAL_SERVER_ERROR,
+    );
+  }
+
+  @Roles(USER_ROLE.ADMIN)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Patch('suspend/:id')
+  async suspendUser(@Param('id') id: string, @Res() response: Response) {
+    const user = await this.usersService.suspendUser(id);
+
+    if (user) {
+      return CreateSuccessResponse(response, user, 'Successful');
+    }
+    throw new HttpException(
+      'Unable to Suspend User. Please try again later!',
       HttpStatus.INTERNAL_SERVER_ERROR,
     );
   }
@@ -54,7 +70,7 @@ export class UsersController {
       return CreateSuccessResponse(
         response,
         userWithVouchers.vouchers,
-        'Successfull',
+        'Successful',
       );
     }
     throw new HttpException(

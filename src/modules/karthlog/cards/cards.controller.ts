@@ -62,7 +62,7 @@ export class CardsController {
   }
 
   @Get(':id')
-  async getSingleCard(@Param() id: string, @Res() response: Response) {
+  async getSingleCard(@Param('id') id: string, @Res() response: Response) {
     const card = await this.cardsService.findOne(id);
     if (card) {
       return CreateSuccessResponse(response, card, 'Successful');
@@ -74,7 +74,7 @@ export class CardsController {
   }
 
   @Get('')
-  async getCard(@Res() response: Response) {
+  async getCards(@Res() response: Response) {
     const cards = await this.cardsService.findAllCards();
     if (cards) {
       return CreateSuccessResponse(response, cards, 'Successful');
@@ -90,7 +90,7 @@ export class CardsController {
   @Patch(':cardId')
   async updateCard(
     @Body() body: Partial<CreateCardDto>,
-    @Param() cardId: string,
+    @Param('cardId') cardId: string,
     @Res() response: Response,
   ) {
     const card = await this.cardsService.updateCard(body, cardId);
@@ -106,7 +106,10 @@ export class CardsController {
   @Roles(USER_ROLE.ADMIN)
   @UseGuards(AuthGuard, RolesGuard)
   @Patch('toggle/:cardId')
-  async toggleCardStatus(@Param() cardId: string, @Res() response: Response) {
+  async toggleCardStatus(
+    @Param('cardId') cardId: string,
+    @Res() response: Response,
+  ) {
     const card = await this.cardsService.toggleCardStatus(cardId);
     if (card) {
       return CreateSuccessResponse(response, card, 'Successful');
@@ -120,7 +123,7 @@ export class CardsController {
   @Roles(USER_ROLE.ADMIN)
   @UseGuards(AuthGuard, RolesGuard)
   @Delete(':cardId')
-  async deleteCard(@Param() cardId: string, @Res() response: Response) {
+  async deleteCard(@Param('cardId') cardId: string, @Res() response: Response) {
     const card = await this.cardsService.deleteCard(cardId);
     if (card) {
       return CreateSuccessResponse(response, card, 'Successful');

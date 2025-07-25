@@ -40,6 +40,7 @@ export class CreateUserDto {
   role: USER_ROLE;
 
   @IsString()
+  @IsOptional()
   @IsNotEmpty()
   phoneNumber: string;
 
