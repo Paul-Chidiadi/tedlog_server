@@ -61,6 +61,20 @@ export class CardsController {
     );
   }
 
+  @Roles(USER_ROLE.ADMIN)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Get('minted')
+  async getMintedCards(@Res() response: Response) {
+    const mintedCards = await this.cardsService.findAllMintedCards();
+    if (mintedCards) {
+      return CreateSuccessResponse(response, mintedCards, 'Successful');
+    }
+    throw new HttpException(
+      'Unable to Get Minted Cards. Please try again later!',
+      HttpStatus.INTERNAL_SERVER_ERROR,
+    );
+  }
+
   @Get(':id')
   async getSingleCard(@Param('id') id: string, @Res() response: Response) {
     const card = await this.cardsService.findOne(id);

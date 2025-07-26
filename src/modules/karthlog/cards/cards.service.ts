@@ -43,6 +43,20 @@ export class CardsService {
     });
   }
 
+  async findAllMintedCards(): Promise<Minted[]> {
+    return await this.mintedRepository.find({
+      select: {
+        id: true,
+        cardNumber: true,
+        cardHash: true,
+        isUsed: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+      relations: ['card'],
+    });
+  }
+
   async findOne(id: string): Promise<Card> {
     return await this.cardRepository.findOne({
       where: { id: id },
