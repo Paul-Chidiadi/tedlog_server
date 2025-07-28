@@ -101,24 +101,6 @@ export class CardsController {
 
   @Roles(USER_ROLE.ADMIN)
   @UseGuards(AuthGuard, RolesGuard)
-  @Patch(':cardId')
-  async updateCard(
-    @Body() body: Partial<CreateCardDto>,
-    @Param('cardId') cardId: string,
-    @Res() response: Response,
-  ) {
-    const card = await this.cardsService.updateCard(body, cardId);
-    if (card) {
-      return CreateSuccessResponse(response, card, 'Successful');
-    }
-    throw new HttpException(
-      'Unable to Update Card. Please try again later!',
-      HttpStatus.INTERNAL_SERVER_ERROR,
-    );
-  }
-
-  @Roles(USER_ROLE.ADMIN)
-  @UseGuards(AuthGuard, RolesGuard)
   @Patch('toggle/:cardId')
   async toggleCardStatus(
     @Param('cardId') cardId: string,
@@ -148,8 +130,7 @@ export class CardsController {
     );
   }
 
-  @Roles(USER_ROLE.ADMIN)
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard)
   @Patch('scan')
   async scanCardAndCreditUser(
     @Body() body: ScanCardDto,
@@ -160,6 +141,24 @@ export class CardsController {
       body,
       currentUser.sub,
     );
+    if (card) {
+      return CreateSuccessResponse(response, card, 'Successful');
+    }
+    throw new HttpException(
+      'Unable to Update Card. Please try again later!',
+      HttpStatus.INTERNAL_SERVER_ERROR,
+    );
+  }
+
+  @Roles(USER_ROLE.ADMIN)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Patch(':cardId')
+  async updateCard(
+    @Body() body: Partial<CreateCardDto>,
+    @Param('cardId') cardId: string,
+    @Res() response: Response,
+  ) {
+    const card = await this.cardsService.updateCard(body, cardId);
     if (card) {
       return CreateSuccessResponse(response, card, 'Successful');
     }

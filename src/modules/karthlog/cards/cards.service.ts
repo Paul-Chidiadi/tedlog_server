@@ -119,26 +119,37 @@ export class CardsService {
     // 1. Find the card by cardNumber
     const mintedCard = await this.mintedRepository.findOne({
       where: { cardNumber, cardHash },
+      relations: ['card'],
     });
     if (!mintedCard) {
       throw new NotFoundException('Card Error, Invalid Card');
     }
 
+    if (mintedCard.isUsed) {
+      throw new BadRequestException('Card Is Used, Invalid Card');
+    }
+
     // 2. Compare the hashes
-    const isMatch = await bcrypt.compare(cardHash, mintedCard.cardHash);
+    const isMatch = await bcrypt.compare(mintedCard.unHashedData, cardHash);
+
     if (!isMatch) {
       throw new BadRequestException('Invalid card credentials');
     }
 
     // 3. Fetch the user
-    const user = await this.userRepository.findOne({ where: { id: userId } });
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['cardsOwned'],
+    });
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
-    // 4. Credit cowrie balance
-    const amountToCredit = Number(mintedCard?.card?.cowrieAmount || 0);
-    user.cowrieBalance += amountToCredit;
+    // 4. Credit cowrie balance, update cardsOwned and karthlog status
+    const amountToCredit = Number(mintedCard?.card?.cowrieAmount) || 0;
+    user.cowrieBalance = Number(user.cowrieBalance) + Number(amountToCredit);
+    user.cardsOwned.push(mintedCard?.card);
+    user.karthlogStatus = true;
     await this.userRepository.save(user);
 
     // Mark the card as used
