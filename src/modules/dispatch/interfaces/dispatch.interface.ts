@@ -14,7 +14,6 @@ export interface IDispatch {
   itemDescription?: string;
   weight?: string;
   cost?: number;
-  voucher?: string;
   status?: DISPATCH_STATUS;
   dateDelivered?: Date;
   dateRecieved?: Date;

@@ -6,6 +6,9 @@ import { Payment } from './entities/payments.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { TRANSACTION_TYPE } from 'src/common/enums/payment.enum';
+import { convertNairaToCowrie } from 'src/common/utils/utils.service';
+import { CowrieService } from '../karthlog/cowrie/cowrie.service';
+import { User } from '../users/entities/user.entity';
 
 @Injectable()
 export class PaymentsService {
@@ -14,6 +17,7 @@ export class PaymentsService {
     private readonly paymentRepository: Repository<Payment>,
 
     private readonly usersService: UsersService,
+    private readonly cowrieService: CowrieService,
   ) {}
 
   async getAllPayments(): Promise<Payment[]> {
@@ -61,7 +65,8 @@ export class PaymentsService {
   async updateTransactionData(payload: any): Promise<Payment> {
     const { amount, email, transactionId, paymentDate, transactType } = payload;
     const user = await this.usersService.findByEmail(email);
-    const transactionData: Partial<Payment> = {
+
+    const transactionDataPayload: Partial<Payment> = {
       email,
       transactionId,
       transactionType:
@@ -72,17 +77,31 @@ export class PaymentsService {
       amount,
       user,
     };
-    const usersBalance = Number(user.walletBalance);
+
+    // GET COWRIE RATE
+    const cowrieData = await this.cowrieService.getCowrieRate();
+    const cowrieEquivalent = convertNairaToCowrie(
+      Number(amount),
+      Number(cowrieData?.amountPerCowrie),
+    );
+    const usersCowrieBalance = Number(user.cowrieBalance);
+
     const newBalance =
-      transactType === 'credit' ? usersBalance + Number(amount) : usersBalance;
-    const userData = {
-      walletBalance: newBalance,
+      transactType === 'credit'
+        ? usersCowrieBalance + Number(cowrieEquivalent)
+        : usersCowrieBalance;
+
+    const userDataPayload: Partial<User> = {
+      cowrieBalance: newBalance,
     };
-    const paymentData = await this.paymentRepository.save(transactionData);
     //UPDATE USERS WALLET
     const updateUserWallet =
       transactType === 'credit' &&
-      (await this.usersService.updateUser(userData, email));
+      (await this.usersService.updateUser(userDataPayload, email));
+
+    const paymentData = await this.paymentRepository.save(
+      transactionDataPayload,
+    );
     return paymentData;
   }
 

@@ -3,12 +3,17 @@ import { ICurrentUser } from '../users/interfaces/user.interface';
 import { IDispatch } from './interfaces/dispatch.interface';
 import { Dispatch } from './entities/dispatch.entity';
 import { UsersService } from '../users/users.service';
-import { Utilities, getDateString } from 'src/common/utils/utils.service';
+import {
+  Utilities,
+  convertNairaToCowrie,
+  getDateString,
+} from 'src/common/utils/utils.service';
 import { DISPATCH_STATUS } from 'src/common/enums/dispatch.enum';
 import { Brackets, Repository, UpdateResult } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Voucher } from './entities/voucher.entity';
 import { PaymentsService } from '../payments/payments.service';
+import { CowrieService } from '../karthlog/cowrie/cowrie.service';
 
 @Injectable()
 export class DispatchService {
@@ -20,6 +25,7 @@ export class DispatchService {
 
     private readonly usersService: UsersService,
     private readonly paymentsService: PaymentsService,
+    private readonly cowrieService: CowrieService,
     private readonly util: Utilities,
   ) {}
 
@@ -40,21 +46,20 @@ export class DispatchService {
       weight,
       itemDescription,
       cost,
-      voucher,
     } = body;
 
     const userData = await this.usersService.findById(currentUser.sub);
-    const voucherData = await this.voucherRepository.findOneBy({ id: voucher });
-    if (voucher && !voucherData) {
-      throw new HttpException('Invalid Voucher', HttpStatus.BAD_REQUEST);
-    }
+    const usersCowrieBalance = Number(userData.cowrieBalance);
 
-    const usersBalance = Number(userData.walletBalance);
-    const voucherValue = voucher ? Number(voucherData.value) : 0;
-    //ADD VOUCHER VALUE TO SEE IF IT CAN REACH
-    const balancePlusVoucher = usersBalance + voucherValue;
+    // CONVERT COST IN NARIA TO COWRIE
+    // GET COWRIE RATE
+    const cowrieData = await this.cowrieService.getCowrieRate();
+    const cowrieEquivalent = convertNairaToCowrie(
+      Number(cost),
+      Number(cowrieData?.amountPerCowrie),
+    );
 
-    if (balancePlusVoucher >= Number(cost)) {
+    if (usersCowrieBalance >= Number(cowrieEquivalent)) {
       const dispatchId = `TEDLOG::${this.util.generateRandomCode(6, false)}`;
       const payload: Partial<Dispatch> = {
         consigneeContact,
@@ -74,11 +79,6 @@ export class DispatchService {
         status: DISPATCH_STATUS.PENDING,
       };
       const dispatch = await this.dispatchRepository.save(payload);
-      if (dispatch && voucher) {
-        //remove voucher if user paid with his voucher
-        await this.voucherRepository.remove(voucherData);
-        return dispatch;
-      }
 
       //Deduct/update wallet balance if user paid with his wallet
       const payloadUpdate: any = {
@@ -88,15 +88,15 @@ export class DispatchService {
         paymentDate: getDateString(),
         transactType: 'debit',
       };
+
       const transactUpdate =
         await this.paymentsService.updateTransactionData(payloadUpdate);
 
-      const walletPayload = {
-        walletBalance: voucher
-          ? usersBalance - (Number(cost) - Number(voucherData.value))
-          : usersBalance - Number(cost),
+      const userWalletPayload = {
+        cowrieBalance: Number(usersCowrieBalance) - Number(cowrieEquivalent),
       };
-      await this.usersService.updateUser(walletPayload, userData.email);
+
+      await this.usersService.updateUser(userWalletPayload, userData.email);
       return dispatch;
     }
     throw new HttpException(

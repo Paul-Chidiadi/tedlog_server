@@ -49,9 +49,4 @@ export class SendDispatchDto {
   @IsNumber()
   @IsNotEmpty()
   cost: number;
-
-  @IsString()
-  @IsNotEmpty()
-  @IsOptional()
-  voucher: string;
 }

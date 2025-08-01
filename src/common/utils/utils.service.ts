@@ -131,3 +131,19 @@ export async function hashString(data: string): Promise<string> {
   const salt = await bcrypt.genSalt();
   return bcrypt.hash(data, salt);
 }
+
+export function convertNairaToCowrie(
+  nariaAmt: number,
+  nariaRatePerCowrie: number,
+): number {
+  const cowrieEquivalent = Number(nariaAmt / nariaRatePerCowrie);
+  return cowrieEquivalent;
+}
+
+export function convertCowrieToNaria(
+  cowrieAmt: number,
+  nariaRatePerCowrie: number,
+): number {
+  const nairaEquivalent = Number(cowrieAmt * nariaRatePerCowrie);
+  return nairaEquivalent;
+}
