@@ -49,3 +49,9 @@ export class CreateUserDto {
   @IsOptional()
   referralId: string;
 }
+
+export class JoinWaitlistDto {
+  @IsString()
+  @IsNotEmpty()
+  email: string;
+}

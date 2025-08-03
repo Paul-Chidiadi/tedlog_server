@@ -5,13 +5,13 @@ import { UsersService } from '../users/users.service';
 import { EmailService } from 'src/common/utils/email.service';
 import { Utilities } from 'src/common/utils/utils.service';
 import { JwtModule, JwtService } from '@nestjs/jwt';
-import { User } from '../users/entities/user.entity';
+import { User, Waitlisted } from '../users/entities/user.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { envConfig } from 'src/common/config/env.config';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, Waitlisted]),
     JwtModule.register({
       global: true,
       secret: envConfig.JWT_SECRET,

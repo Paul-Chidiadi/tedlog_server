@@ -11,7 +11,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto, JoinWaitlistDto } from './dto/create-user.dto';
 import { CreateSuccessResponse } from 'src/common/utils/response.utils';
 import { LoginDto } from './dto/login.dto';
 import { envConfig } from 'src/common/config/env.config';
@@ -237,6 +237,18 @@ export class AuthController {
     }
     throw new HttpException(
       'Unable to Chanage Email. Please try again later!',
+      HttpStatus.INTERNAL_SERVER_ERROR,
+    );
+  }
+
+  @Post('waitlist')
+  async joinWaitlist(@Res() response: Response, @Body() body: JoinWaitlistDto) {
+    const result = await this.authService.joinWaitlist(body.email);
+    if (result) {
+      return CreateSuccessResponse(response, result, 'Successful');
+    }
+    throw new HttpException(
+      'Unable to Join Waitlist. Please try again later!',
       HttpStatus.INTERNAL_SERVER_ERROR,
     );
   }

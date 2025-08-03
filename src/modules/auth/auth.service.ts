@@ -8,9 +8,10 @@ import {
   ILoginResponse,
   IUser,
 } from '../users/interfaces/user.interface';
-import { User } from '../users/entities/user.entity';
+import { User, Waitlisted } from '../users/entities/user.entity';
 import { envConfig } from 'src/common/config/env.config';
-import { UpdateResult } from 'typeorm';
+import { Repository, UpdateResult } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class AuthService {
@@ -19,6 +20,9 @@ export class AuthService {
     private readonly emailService: EmailService,
     private readonly util: Utilities,
     private jwtService: JwtService,
+
+    @InjectRepository(Waitlisted)
+    private readonly waitlistedsRepository: Repository<Waitlisted>,
   ) {}
 
   async createAccessToken(payload: any): Promise<string> {
@@ -381,5 +385,32 @@ export class AuthService {
     };
     const updatedUser = await this.usersService.updateUser(payload, user.email);
     return updatedUser;
+  }
+
+  async joinWaitlist(email: string): Promise<Waitlisted> {
+    //Get user information
+    const alreadyWaitlisedUser = await this.waitlistedsRepository.findOne({
+      where: { email },
+    });
+    if (alreadyWaitlisedUser) {
+      throw new HttpException(
+        'User already waitlisted',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const payload: Partial<Waitlisted> = {
+      email,
+    };
+    const waitlisedUser = await this.waitlistedsRepository.save(payload);
+
+    const userInfo = {
+      email,
+      subject: 'Early Access Secured. This story needs you to carry it!',
+    };
+    // send email notification
+    ////////////////////////////////////////////////////////////////
+    await this.emailService.sendWaitlistEmail(userInfo);
+    return waitlisedUser;
   }
 }

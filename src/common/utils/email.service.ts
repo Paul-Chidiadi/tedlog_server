@@ -81,13 +81,13 @@ export class EmailService {
   }
 
   async accountActivationMail(options: Mail) {
-    const message = `<p>Welcome to Blacc Theddi ${options.firstName},
+    const message = `<p>Welcome to MADEINBLACC ${options.firstName},
     your account have been activated. Kindly login to continue<p>`;
     return await this.sendMail(options, message);
   }
 
   async logInMail(options: Mail) {
-    const message = `Welcome to Blacc Theddi ${options.firstName},
+    const message = `Welcome to MADEINBLACC ${options.firstName},
         <p>We notice you just login your account at time: ${this.util.Date()}</p>
         If you didn't initiate this login attempt, Please click <a href='#'>here</a> to change your password, someone may be trying to gain access to your account. <br>Team Blacc Theddi
         `;
@@ -109,7 +109,7 @@ export class EmailService {
         If you didn't request this, please ignore this email. Your password won't change until you access the link above and create a new one.
         <br> 
         Thanks,  <br> 
-        Team Blacc Theddi <p/>`;
+        Team MADEINBLACC <p/>`;
       return await this.sendMail(options, message);
     }
   }
@@ -118,7 +118,27 @@ export class EmailService {
     Hi ${options.firstName}, <br> 
     You have successfully reset your password.
       <br> 
-    Team Blacc Theddi <p/>`;
+    Team MADEINBLACC <p/>`;
+    return await this.sendMail(options, message);
+  }
+
+  async sendWaitlistEmail(options: Mail) {
+    const message = `
+      <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+        <h2 style="color: #D23559;">Welcome to MADEINBLACC!</h2>
+        <p>Thank you for joining our waitlist. We're thrilled to have you as part our community.</p>
+        <p>You'll be the first to know when we launch.</p>
+        <p>Until then, feel free to connect with us on social media.</p>
+  
+        <hr style="margin: 20px 0;" />
+  
+        <p>With appreciation,</p>
+        <p><strong>Team MADEINBLACC</strong></p>
+  
+        <p style="font-size: 12px; color: #777;">If you did not sign up for this, you can ignore this email.</p>
+      </div>
+    `;
+
     return await this.sendMail(options, message);
   }
 }

@@ -1,6 +1,6 @@
 import { DataSource, DataSourceOptions } from 'typeorm';
 import { dbConfig } from '../env.config';
-import { User } from 'src/modules/users/entities/user.entity';
+import { User, Waitlisted } from 'src/modules/users/entities/user.entity';
 import { Dispatch } from 'src/modules/dispatch/entities/dispatch.entity';
 import { Voucher } from 'src/modules/dispatch/entities/voucher.entity';
 import { Payment } from 'src/modules/payments/entities/payments.entity';
@@ -29,6 +29,7 @@ export const dataSourceOptions: DataSourceOptions = {
     Transaction,
     Cowrie,
     CowrieHistory,
+    Waitlisted,
   ],
   synchronize: true,
   ssl: dbConfig.DB_SSL === 'true' ? { rejectUnauthorized: false } : undefined,

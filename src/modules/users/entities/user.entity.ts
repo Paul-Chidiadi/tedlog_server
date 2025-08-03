@@ -104,3 +104,18 @@ export class User {
   })
   karthlogTransactions: Transaction[];
 }
+
+@Entity('waitlisted')
+export class Waitlisted {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column({ length: 100, unique: true })
+  email: string;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+}
