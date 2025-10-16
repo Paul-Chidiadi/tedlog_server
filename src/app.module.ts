@@ -11,6 +11,7 @@ import { AdminModule } from './modules/admin/admin.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { KarthlogModule } from './modules/karthlog/karthlog.module';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { NotificationsModule } from './modules/notifications/notifications.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
     AdminModule,
     PaymentsModule,
     KarthlogModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

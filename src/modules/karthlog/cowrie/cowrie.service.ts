@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, UpdateResult } from 'typeorm';
 import { Cowrie, CowrieHistory } from './entities/cowrie.entity';
 import { ICurrentUser } from 'src/modules/users/interfaces/user.interface';
+import { NotificationsService } from 'src/modules/notifications/notifications.service';
+import { NOTIFICATION_TYPE } from 'src/modules/notifications/interfaces/notification.interface';
 
 @Injectable()
 export class CowrieService {
@@ -11,6 +13,8 @@ export class CowrieService {
     private readonly cowrieRepository: Repository<Cowrie>,
     @InjectRepository(CowrieHistory)
     private readonly cowrieHistoryRepository: Repository<CowrieHistory>,
+
+    private notificationService: NotificationsService,
   ) {}
 
   private readonly logger = new Logger('Cowrie');
@@ -43,9 +47,20 @@ export class CowrieService {
     await this.cowrieHistoryRepository.save({
       rate: payload.amountPerCowrie,
     });
-    return await this.cowrieRepository.save({
+
+    const cowrieRate = await this.cowrieRepository.save({
       ...payload,
     });
+
+    if (cowrieRate) {
+      await this.notificationService.create({
+        // recipient: user,
+        notificationMessage: `Currency price update (new value of cowrie) ${payload.amountPerCowrie} per cowrie`,
+        notificationType: NOTIFICATION_TYPE.WALLET_BALANCE,
+      });
+    }
+
+    return cowrieRate;
   }
 
   async updateCowrieRate(

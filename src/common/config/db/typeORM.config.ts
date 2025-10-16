@@ -10,6 +10,7 @@ import {
   CowrieHistory,
 } from 'src/modules/karthlog/cowrie/entities/cowrie.entity';
 import { Transaction } from 'src/modules/karthlog/transactions/entities/transactions.entity';
+import { Notification } from 'src/modules/notifications/entities/notifications.entity';
 
 export const dataSourceOptions: DataSourceOptions = {
   // TypeORM PostgreSQL DB Drivers
@@ -30,6 +31,7 @@ export const dataSourceOptions: DataSourceOptions = {
     Cowrie,
     CowrieHistory,
     Waitlisted,
+    Notification,
   ],
   synchronize: true,
   ssl: dbConfig.DB_SSL === 'true' ? { rejectUnauthorized: false } : undefined,

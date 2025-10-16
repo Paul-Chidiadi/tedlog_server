@@ -14,6 +14,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Voucher } from './entities/voucher.entity';
 import { PaymentsService } from '../payments/payments.service';
 import { CowrieService } from '../karthlog/cowrie/cowrie.service';
+import { NotificationsService } from '../notifications/notifications.service';
+import { NOTIFICATION_TYPE } from '../notifications/interfaces/notification.interface';
 
 @Injectable()
 export class DispatchService {
@@ -27,6 +29,8 @@ export class DispatchService {
     private readonly paymentsService: PaymentsService,
     private readonly cowrieService: CowrieService,
     private readonly util: Utilities,
+
+    private notificationService: NotificationsService,
   ) {}
 
   async sendDispatch(
@@ -96,9 +100,22 @@ export class DispatchService {
         cowrieBalance: Number(usersCowrieBalance) - Number(cowrieEquivalent),
       };
 
-      await this.usersService.updateUser(userWalletPayload, userData.email);
+      //UPDATE USERS WALLET
+      const updateUserWallet = await this.usersService.updateUser(
+        userWalletPayload,
+        userData.email,
+      );
+
+      if (updateUserWallet) {
+        await this.notificationService.create({
+          recipient: userData,
+          notificationMessage: `Your wallet has been debited with ${cost}`,
+          notificationType: NOTIFICATION_TYPE.WALLET_BALANCE,
+        });
+      }
       return dispatch;
     }
+
     throw new HttpException(
       'Insufficeint funds, Please fund your wallet',
       HttpStatus.BAD_REQUEST,

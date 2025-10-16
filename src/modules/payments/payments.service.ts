@@ -9,6 +9,8 @@ import { TRANSACTION_TYPE } from 'src/common/enums/payment.enum';
 import { convertNairaToCowrie } from 'src/common/utils/utils.service';
 import { CowrieService } from '../karthlog/cowrie/cowrie.service';
 import { User } from '../users/entities/user.entity';
+import { NotificationsService } from '../notifications/notifications.service';
+import { NOTIFICATION_TYPE } from '../notifications/interfaces/notification.interface';
 
 @Injectable()
 export class PaymentsService {
@@ -18,6 +20,8 @@ export class PaymentsService {
 
     private readonly usersService: UsersService,
     private readonly cowrieService: CowrieService,
+
+    private notificationService: NotificationsService,
   ) {}
 
   async getAllPayments(): Promise<Payment[]> {
@@ -98,6 +102,14 @@ export class PaymentsService {
     const updateUserWallet =
       transactType === 'credit' &&
       (await this.usersService.updateUser(userDataPayload, email));
+
+    if (updateUserWallet) {
+      await this.notificationService.create({
+        recipient: user,
+        notificationMessage: `Your wallet has been credited with ${amount}`,
+        notificationType: NOTIFICATION_TYPE.WALLET_BALANCE,
+      });
+    }
 
     const paymentData = await this.paymentRepository.save(
       transactionDataPayload,

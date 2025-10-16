@@ -4,6 +4,7 @@ import { Dispatch } from 'src/modules/dispatch/entities/dispatch.entity';
 import { Voucher } from 'src/modules/dispatch/entities/voucher.entity';
 import { Card } from 'src/modules/karthlog/cards/entities/cards.entity';
 import { Transaction } from 'src/modules/karthlog/transactions/entities/transactions.entity';
+import { Notification } from 'src/modules/notifications/entities/notifications.entity';
 import { Payment } from 'src/modules/payments/entities/payments.entity';
 import {
   Entity,
@@ -103,6 +104,11 @@ export class User {
     eager: true,
   })
   karthlogTransactions: Transaction[];
+
+  @OneToMany(() => Notification, (notification) => notification.recipient, {
+    cascade: true,
+  })
+  notifications: Notification[];
 }
 
 @Entity('waitlisted')

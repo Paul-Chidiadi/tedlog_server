@@ -15,6 +15,8 @@ import { Transaction } from '../transactions/entities/transactions.entity';
 import * as bcrypt from 'bcrypt';
 import { TRANSACTION_TYPE } from 'src/common/enums/payment.enum';
 import { ScanCardDto } from './dto/create-card.dto';
+import { NotificationsService } from 'src/modules/notifications/notifications.service';
+import { NOTIFICATION_TYPE } from 'src/modules/notifications/interfaces/notification.interface';
 
 @Injectable()
 export class CardsService {
@@ -27,6 +29,8 @@ export class CardsService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(Transaction)
     private readonly transactionRepository: Repository<Transaction>,
+
+    private notificationService: NotificationsService,
   ) {}
 
   async create(createCard: Partial<Card>): Promise<Card> {
@@ -34,6 +38,13 @@ export class CardsService {
       ...createCard,
     };
     const savedResult = await this.cardRepository.save(payload);
+    if (savedResult) {
+      await this.notificationService.create({
+        // recipient: user,
+        notificationMessage: `New Karthlog card created ${createCard.name} ${createCard.type} CARD`,
+        notificationType: NOTIFICATION_TYPE.WALLET_BALANCE,
+      });
+    }
     return savedResult;
   }
 
@@ -150,7 +161,14 @@ export class CardsService {
     user.cowrieBalance = Number(user.cowrieBalance) + Number(amountToCredit);
     user.cardsOwned.push(mintedCard?.card);
     user.karthlogStatus = true;
-    await this.userRepository.save(user);
+    const updateUserWallet = await this.userRepository.save(user);
+    if (updateUserWallet) {
+      await this.notificationService.create({
+        recipient: user,
+        notificationMessage: `Your wallet has been credited with ${amountToCredit} cowries`,
+        notificationType: NOTIFICATION_TYPE.WALLET_BALANCE,
+      });
+    }
 
     // Mark the card as used
     await this.mintedRepository.update(
