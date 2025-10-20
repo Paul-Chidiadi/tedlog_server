@@ -26,7 +26,8 @@ async function bootstrap() {
 
   // Enable CORS
   app.enableCors({
-    origin: [`${envConfig.LOCAL_URL}`, `${envConfig.CLIENT_URL}`],
+    origin: '*',
+    // origin: [`${envConfig.LOCAL_URL}`, `${envConfig.CLIENT_URL}`],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Set-Cookie'],

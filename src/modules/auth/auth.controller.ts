@@ -60,6 +60,7 @@ export class AuthController {
         res,
         {
           accessToken,
+          refreshToken,
           user,
         },
         'Login Succesfull',

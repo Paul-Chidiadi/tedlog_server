@@ -154,6 +154,8 @@ export class AuthService {
   }
 
   async login(email: string, password: string): Promise<ILoginResponse> {
+    console.log(email);
+
     // check if user with email exists
     const user = await this.usersService.findByEmail(email);
     if (!user) {
