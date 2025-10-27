@@ -2,12 +2,43 @@ import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import { emailConfig } from '../config/env.config';
 import { Utilities } from './utils.service';
+import * as fs from 'fs/promises';
+import * as path from 'path';
+import * as Handlebars from 'handlebars';
 
 export interface Mail {
   email: string;
   firstName?: string;
   OTP?: number | string;
   subject: string;
+}
+
+interface WelcomeEmailData {
+  firstName: string;
+  dashboardUrl: string;
+  unsubscribeUrl: string;
+  googlePlayUrl: string;
+  appleUrl: string;
+  twitterUrl: string;
+  facebookUrl: string;
+  instagramUrl: string;
+  logoUrl: string;
+}
+
+interface SecurityAlertData {
+  firstName: string;
+  device: string;
+  location: string;
+  loginTime: string;
+  mapImageUrl: string;
+  secureAccountUrl: string;
+  unsubscribeUrl: string;
+  googlePlayUrl: string;
+  appleUrl: string;
+  twitterUrl: string;
+  facebookUrl: string;
+  instagramUrl: string;
+  logoUrl: string;
 }
 
 @Injectable()
@@ -18,8 +49,267 @@ export class EmailService {
   private MAIL_USERNAME = emailConfig.MAIL_USERNAME;
   private MAIL_PASSWORD = emailConfig.MAIL_PASSWORD;
   private MAIL_PORT = emailConfig.MAIL_PORT;
+  private templatesCache: Map<string, HandlebarsTemplateDelegate> = new Map();
 
   constructor(private readonly util: Utilities) {}
+
+  private async loadTemplate(
+    templateName: string,
+  ): Promise<HandlebarsTemplateDelegate> {
+    // Check cache first
+    if (this.templatesCache.has(templateName)) {
+      return this.templatesCache.get(templateName);
+    }
+
+    try {
+      const templatePath = path.join(
+        process.cwd(),
+        'src',
+        'mail',
+        'templates',
+        `${templateName}.html`,
+      );
+
+      const templateContent = await fs.readFile(templatePath, 'utf-8');
+      const compiledTemplate = Handlebars.compile(templateContent);
+
+      // Cache the compiled template
+      this.templatesCache.set(templateName, compiledTemplate);
+
+      return compiledTemplate;
+    } catch (error) {
+      console.error(`Error loading template ${templateName}:`, error);
+      throw new Error(`Failed to load email template: ${templateName}`);
+    }
+  }
+
+  private async renderTemplate(
+    templateName: string,
+    data: Record<string, any>,
+  ): Promise<string> {
+    const template = await this.loadTemplate(templateName);
+    return template(data);
+  }
+
+  async sendWelcomeEmail(
+    email: string,
+    firstName: string,
+    dashboardUrl?: string,
+  ): Promise<any> {
+    const templateData: WelcomeEmailData = {
+      firstName,
+      dashboardUrl: dashboardUrl || `${process.env.FRONTEND_URL}`,
+      twitterUrl: `${process.env.TWITTER_URL}`,
+      facebookUrl: `${process.env.FACEBOOK_URL}`,
+      instagramUrl: `${process.env.INSTAGRAM_URL}`,
+      googlePlayUrl: `${process.env.GOOGLE_PLAY_URL}`,
+      appleUrl: `${process.env.APPLE_URL}`,
+      unsubscribeUrl: `${process.env.FRONTEND_URL}/unsubscribe?email=${encodeURIComponent(email)}`,
+      logoUrl: `https://wirecartserver.madeinblacc.net/images/logo.png`,
+    };
+
+    const htmlContent = await this.renderTemplate('welcome', templateData);
+
+    const mailOptions: Mail = {
+      email,
+      subject: 'Welcome to MadeInBlacc Factory 🤎',
+      firstName,
+    };
+
+    return await this.sendMail(mailOptions, htmlContent);
+  }
+
+  async sendSecurityAlert(
+    email: string,
+    firstName: string,
+    loginData: {
+      device: string;
+      location: string;
+      loginTime: string;
+      latitude?: number;
+      longitude?: number;
+    },
+  ): Promise<any> {
+    // Generate static map URL (using Google Maps Static API or similar)
+    let mapImageUrl = '';
+    if (loginData.latitude && loginData.longitude) {
+      mapImageUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${loginData.latitude},${loginData.longitude}&zoom=13&size=600x300&maptype=roadmap&markers=color:blue%7C${loginData.latitude},${loginData.longitude}&key=${process.env.GOOGLE_MAPS_API_KEY}`;
+    }
+
+    const templateData: SecurityAlertData = {
+      firstName,
+      device: loginData.device,
+      location: loginData.location,
+      loginTime: loginData.loginTime,
+      mapImageUrl,
+      secureAccountUrl: `${process.env.FRONTEND_URL}`,
+      unsubscribeUrl: `${process.env.FRONTEND_URL}/unsubscribe?email=${encodeURIComponent(email)}`,
+      twitterUrl: `${process.env.TWITTER_URL}`,
+      facebookUrl: `${process.env.FACEBOOK_URL}`,
+      instagramUrl: `${process.env.INSTAGRAM_URL}`,
+      googlePlayUrl: `${process.env.GOOGLE_PLAY_URL}`,
+      appleUrl: `${process.env.APPLE_URL}`,
+      logoUrl: `https://wirecartserver.madeinblacc.net/images/logo.png`,
+    };
+
+    const htmlContent = await this.renderTemplate('security', templateData);
+
+    const mailOptions: Mail = {
+      email,
+      subject: 'Security Alert: New sign-in detected',
+      firstName,
+    };
+
+    return await this.sendMail(mailOptions, htmlContent);
+  }
+
+  async sendPaymentConfirmation(
+    email: string,
+    firstName: string,
+    paymentData: {
+      amount: string;
+      transactionId: string;
+      transactionDate: string;
+    },
+  ): Promise<any> {
+    const templateData = {
+      firstName,
+      amount: paymentData.amount,
+      transactionId: paymentData.transactionId,
+      transactionDate: paymentData.transactionDate,
+      receiptUrl: `${process.env.FRONTEND_URL}/receipts/${paymentData.transactionId}`,
+      unsubscribeUrl: `${process.env.FRONTEND_URL}/unsubscribe?email=${encodeURIComponent(email)}`,
+      twitterUrl: `${process.env.TWITTER_URL}`,
+      facebookUrl: `${process.env.FACEBOOK_URL}`,
+      instagramUrl: `${process.env.INSTAGRAM_URL}`,
+      googlePlayUrl: `${process.env.GOOGLE_PLAY_URL}`,
+      appleUrl: `${process.env.APPLE_URL}`,
+      logoUrl: `https://wirecartserver.madeinblacc.net/images/logo.png`,
+    };
+
+    const htmlContent = await this.renderTemplate('payment', templateData);
+
+    const mailOptions: Mail = {
+      email,
+      subject: 'Payment Confirmation - Transaction Successful 💸',
+      firstName: firstName,
+    };
+
+    return await this.sendMail(mailOptions, htmlContent);
+  }
+
+  async sendProductNews(
+    email: string,
+    firstName: string,
+    updates?: string[],
+  ): Promise<any> {
+    const templateData = {
+      firstName,
+      updatesUrl: `${process.env.FRONTEND_URL}`,
+      unsubscribeUrl: `${process.env.FRONTEND_URL}/unsubscribe?email=${encodeURIComponent(email)}`,
+      twitterUrl: `${process.env.TWITTER_URL}`,
+      facebookUrl: `${process.env.FACEBOOK_URL}`,
+      instagramUrl: `${process.env.INSTAGRAM_URL}`,
+      googlePlayUrl: `${process.env.GOOGLE_PLAY_URL}`,
+      appleUrl: `${process.env.APPLE_URL}`,
+      logoUrl: `https://wirecartserver.madeinblacc.net/images/logo.png`,
+    };
+
+    const htmlContent = await this.renderTemplate('productnews', templateData);
+
+    const mailOptions: Mail = {
+      email,
+      subject: 'Something New Just Dropped from the Factory 🏭',
+      firstName,
+    };
+
+    return await this.sendMail(mailOptions, htmlContent);
+  }
+
+  async sendDeliveryTracking(
+    email: string,
+    firstName: string,
+    trackingData: {
+      trackingId: string;
+      pickupPoint: string;
+      expectedDelivery: string;
+    },
+  ): Promise<any> {
+    const templateData = {
+      firstName,
+      trackingId: trackingData.trackingId,
+      pickupPoint: trackingData.pickupPoint,
+      expectedDelivery: trackingData.expectedDelivery,
+      trackingUrl: `${process.env.WIRECART_URL}/track?id=${trackingData.trackingId}`,
+      unsubscribeUrl: `${process.env.FRONTEND_URL}/unsubscribe?email=${encodeURIComponent(email)}`,
+      twitterUrl: `${process.env.TWITTER_URL}`,
+      facebookUrl: `${process.env.FACEBOOK_URL}`,
+      instagramUrl: `${process.env.INSTAGRAM_URL}`,
+      googlePlayUrl: `${process.env.GOOGLE_PLAY_URL}`,
+      appleUrl: `${process.env.APPLE_URL}`,
+      logoUrl: `https://wirecartserver.madeinblacc.net/images/logo.png`,
+    };
+
+    const htmlContent = await this.renderTemplate('tracking', templateData);
+
+    const mailOptions: Mail = {
+      email,
+      subject: 'Your Delivery is On the Move 📦',
+      firstName: firstName,
+    };
+
+    return await this.sendMail(mailOptions, htmlContent);
+  }
+
+  async sendMonthlyEditorial(
+    email: string,
+    firstName: string,
+    month: string,
+  ): Promise<any> {
+    const templateData = {
+      firstName,
+      month,
+      editorialUrl: `${process.env.FRONTEND_URL}}`,
+      unsubscribeUrl: `${process.env.FRONTEND_URL}/unsubscribe?email=${encodeURIComponent(email)}`,
+      twitterUrl: `${process.env.TWITTER_URL}`,
+      facebookUrl: `${process.env.FACEBOOK_URL}`,
+      instagramUrl: `${process.env.INSTAGRAM_URL}`,
+      googlePlayUrl: `${process.env.GOOGLE_PLAY_URL}`,
+      appleUrl: `${process.env.APPLE_URL}`,
+      logoUrl: `https://wirecartserver.madeinblacc.net/images/logo.png`,
+    };
+
+    const htmlContent = await this.renderTemplate('editorial', templateData);
+
+    const mailOptions: Mail = {
+      email,
+      subject: `${month} Issue: Awka Stories That Keep Moving 📖`,
+      firstName,
+    };
+
+    return await this.sendMail(mailOptions, htmlContent);
+  }
+
+  async sendTemplateEmail(
+    email: string,
+    subject: string,
+    templateName: string,
+    templateData: Record<string, any>,
+  ): Promise<any> {
+    const htmlContent = await this.renderTemplate(templateName, templateData);
+
+    const mailOptions: Mail = {
+      email,
+      subject,
+      firstName: templateData.firstName,
+    };
+
+    return await this.sendMail(mailOptions, htmlContent);
+  }
+
+  clearTemplateCache() {
+    this.templatesCache.clear();
+  }
 
   async sendMail(options: Mail, template: string): Promise<any> {
     const text = await this.util.convertEmailToText(template);

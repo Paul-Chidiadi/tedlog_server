@@ -12,9 +12,15 @@ import { PaymentsModule } from './modules/payments/payments.module';
 import { KarthlogModule } from './modules/karthlog/karthlog.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { NotificationsModule } from './modules/notifications/notifications.module';
+import { join } from 'path';
+import { ServeStaticModule } from '@nestjs/serve-static';
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
+      serveRoot: '/', // Files will be served from root URL
+    }),
     TypeOrmModule.forRoot(dataSourceOptions),
     ThrottlerModule.forRoot({
       throttlers: [

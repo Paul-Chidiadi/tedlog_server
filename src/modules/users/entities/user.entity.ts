@@ -49,6 +49,12 @@ export class User {
   @Column({ default: 0, nullable: true })
   referrals: number;
 
+  @Column({ default: 0, nullable: true })
+  streakCount: number;
+
+  @Column({ default: 0, nullable: true })
+  totalShellsEarned: number;
+
   @Column({
     type: 'enum',
     enum: ['driver', 'consignor', 'consignee', 'admin'],

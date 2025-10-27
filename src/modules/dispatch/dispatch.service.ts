@@ -16,6 +16,7 @@ import { PaymentsService } from '../payments/payments.service';
 import { CowrieService } from '../karthlog/cowrie/cowrie.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { NOTIFICATION_TYPE } from '../notifications/interfaces/notification.interface';
+import { EmailService } from 'src/common/utils/email.service';
 
 @Injectable()
 export class DispatchService {
@@ -29,6 +30,7 @@ export class DispatchService {
     private readonly paymentsService: PaymentsService,
     private readonly cowrieService: CowrieService,
     private readonly util: Utilities,
+    private readonly emailService: EmailService,
 
     private notificationService: NotificationsService,
   ) {}
@@ -104,6 +106,16 @@ export class DispatchService {
       const updateUserWallet = await this.usersService.updateUser(
         userWalletPayload,
         userData.email,
+      );
+
+      const sendMail = await this.emailService.sendDeliveryTracking(
+        userData.email,
+        userData.name.split(' ')[0],
+        {
+          trackingId: dispatch.dispatchId,
+          pickupPoint: consignorLocation,
+          expectedDelivery: dispatch.productType,
+        },
       );
 
       if (updateUserWallet) {

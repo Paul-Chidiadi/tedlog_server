@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Monthly Editorial - MadeInBlacc</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+          'Helvetica Neue', Arial, sans-serif;
+        background-color: #f5f5f5;
+        padding: 0;
+        line-height: 1.6;
+      }
+      .email-wrapper {
+        max-width: 600px;
+        margin: 0 auto;
+        background-color: #ffffff;
+        padding: 20px;
+      }
+      .header-label {
+        color: #d1d5db;
+        font-size: 13px;
+        margin-bottom: 15px;
+        letter-spacing: 0.3px;
+      }
+      .container {
+        background-color: #ffffff;
+        padding: 50px 45px;
+        border-radius: 0;
+      }
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 70px;
+      }
+      .logo-container {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .logo {
+        width: 55px;
+        height: 55px;
+        margin-bottom: 5px;
+      }
+      .logo-text {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: #111827;
+      }
+      .social-icons {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+        margin-top: 10px;
+      }
+      .social-icon {
+        width: 28px;
+        height: 28px;
+        color: #6b7280;
+      }
+      .main-title {
+        font-size: 28px;
+        font-weight: 600;
+        margin-bottom: 35px;
+        color: #111827;
+        line-height: 1.4;
+      }
+      .greeting {
+        color: #111827;
+        margin-bottom: 25px;
+        font-size: 16px;
+      }
+      .intro-text {
+        color: #4b5563;
+        margin-bottom: 35px;
+        font-size: 16px;
+        line-height: 1.7;
+      }
+      .content-list {
+        margin: 35px 0;
+        padding-left: 20px;
+      }
+      .content-list li {
+        color: #4b5563;
+        margin-bottom: 12px;
+        font-size: 16px;
+        line-height: 1.6;
+      }
+      .tagline {
+        color: #4b5563;
+        margin: 35px 0;
+        font-size: 16px;
+        line-height: 1.7;
+      }
+      .cta-button {
+        display: inline-block;
+        background-color: #1f2937;
+        color: #ffffff;
+        padding: 15px 40px;
+        text-decoration: none;
+        border-radius: 0;
+        font-weight: 500;
+        font-size: 15px;
+        margin: 20px 0 50px 0;
+        letter-spacing: 0.3px;
+      }
+      .signature {
+        color: #6b7280;
+        font-size: 16px;
+        font-style: italic;
+        margin: 40px 0;
+        padding-top: 20px;
+      }
+      .app-download {
+        margin: 60px 0 40px 0;
+        padding-top: 40px;
+      }
+      .app-download-text {
+        color: #111827;
+        margin-bottom: 20px;
+        font-size: 15px;
+      }
+      .app-badges {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .app-badge {
+        height: 44px;
+      }
+      .footer {
+        margin-top: 40px;
+        padding-top: 0;
+        color: #111827;
+        font-size: 14px;
+        line-height: 1.7;
+      }
+      .footer p {
+        margin-bottom: 10px;
+      }
+      .footer a {
+        color: #111827;
+        text-decoration: underline;
+      }
+      .footer-location {
+        margin-top: 25px;
+        color: #111827;
+      }
+      .footer-location p {
+        margin-bottom: 5px;
+      }
+      @media only screen and (max-width: 600px) {
+        .email-wrapper {
+          padding: 10px;
+        }
+        .container {
+          padding: 30px 25px;
+        }
+        .header {
+          flex-direction: column;
+          gap: 20px;
+        }
+        .social-icons {
+          margin-top: 15px;
+        }
+        .main-title {
+          font-size: 24px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="email-wrapper">
+      <div class="container">
+        <!-- Header -->
+        <div class="header">
+          <div class="logo-container">
+            <img src="{{logoUrl}}" alt="MadeInBlacc" class="logo" />
+          </div>
+          <div class="social-icons">
+            <a href="{{twitterUrl}}" class="social-icon">
+              <svg
+                width="28"
+                height="28"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path
+                  d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"
+                />
+              </svg>
+            </a>
+            <a href="{{facebookUrl}}" class="social-icon">
+              <svg
+                width="28"
+                height="28"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path
+                  d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"
+                />
+              </svg>
+            </a>
+            <a href="{{instagramUrl}}" class="social-icon">
+              <svg
+                width="28"
+                height="28"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                <path
+                  d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"
+                  fill="white"
+                />
+                <line
+                  x1="17.5"
+                  y1="6.5"
+                  x2="17.51"
+                  y2="6.5"
+                  stroke="white"
+                  stroke-width="2"
+                />
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Main Content -->
+        <h1 class="main-title">
+          Awka. Africa. And the stories that keep moving — your {{month}} Issue
+          is here
+        </h1>
+
+        <p class="greeting">Hello {{fullName}},</p>
+
+        <p class="intro-text">
+          This month's editorial takes you inside the movement — the streets,
+          the noise, and the culture that shapes us.
+        </p>
+
+        <!-- Content List -->
+        <ul class="content-list">
+          <li>Unboxed Nights — When the City Woke Up</li>
+          <li>This Side of Town — The People Who Keep Awka Alive</li>
+          <li>Inside Blacc — Notes from the Factory Floor</li>
+        </ul>
+
+        <p class="tagline">
+          These are real stories. Told in real time. From the little big city.
+        </p>
+
+        <a href="{{editorialUrl}}" class="cta-button">Read Now</a>
+
+        <p class="signature">BlaccTheddiPost — in pursuit of change</p>
+
+        <!-- App Download Section -->
+        <div class="app-download">
+          <p class="app-download-text">
+            Madeinblacc at the touch of a button! Download our app for Google &
+            App store.
+          </p>
+          <div class="app-badges">
+            <a href="{{googlePlayUrl}}">
+              <img
+                src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
+                alt="Get it on Google Play"
+                class="app-badge"
+              />
+            </a>
+            <a href="{{appleUrl}}">
+              <img
+                src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg"
+                alt="Download on the App Store"
+                class="app-badge"
+              />
+            </a>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+          <p>
+            Questions or faq? Contact us at
+            <a href="mailto:Contact@madeinblacc.net">Contact@madeinblacc.net</a>
+            If you'd rather not receive this kind of email, Don't want any more
+            emails from Madeinblacc?
+            <a href="{{unsubscribeUrl}}">Unsubscribe</a>.
+          </p>
+
+          <div class="footer-location">
+            <p>Awka, Anambra state, Nigeria</p>
+            <p>© 2025 Madeinblacc</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

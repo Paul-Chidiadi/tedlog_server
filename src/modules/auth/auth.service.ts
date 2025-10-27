@@ -77,6 +77,16 @@ export class AuthService {
     }
   }
 
+  private parseUserAgent(userAgent: string): string {
+    // Simple user agent parsing - you might want to use a library like 'ua-parser-js'
+    if (userAgent.includes('iPhone')) return 'iPhone';
+    if (userAgent.includes('iPad')) return 'iPad';
+    if (userAgent.includes('Android')) return 'Android Device';
+    if (userAgent.includes('Windows')) return 'Windows PC';
+    if (userAgent.includes('Mac')) return 'Mac';
+    return 'Unknown Device';
+  }
+
   async signup(body: IUser): Promise<Partial<User>> {
     const {
       email,
@@ -122,6 +132,10 @@ export class AuthService {
       subject: 'Welcome to your Theddi Account',
       OTP: createdUser.OTP,
     });
+    const sendSecondMail = await this.emailService.sendWelcomeEmail(
+      createdUser.email,
+      createdUser.name,
+    );
 
     //Save student into database
     if (sendMail.accepted[0] === email) {
@@ -153,8 +167,27 @@ export class AuthService {
     }
   }
 
-  async login(email: string, password: string): Promise<ILoginResponse> {
-    console.log(email);
+  async login(
+    email: string,
+    password: string,
+    userAgent: any,
+    ip: any,
+  ): Promise<ILoginResponse> {
+    // You might want to use a service to get location from IP
+    const loginData = {
+      device: this.parseUserAgent(userAgent),
+      location: 'lagos, Nigeria',
+      loginTime: new Date().toLocaleString('en-US', {
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+      }),
+      latitude: 6.6137,
+      longitude: 3.3553,
+    };
 
     // check if user with email exists
     const user = await this.usersService.findByEmail(email);
@@ -182,6 +215,12 @@ export class AuthService {
     // Generate a JWT and return it here
     const accessToken = await this.createAccessToken(payload);
     const refreshToken = await this.createRefreshToken(payload);
+
+    const sendMail = await this.emailService.sendSecurityAlert(
+      email,
+      user.name.split(' ')[0],
+      loginData,
+    );
 
     return {
       user: { ...user, passwordDigest: null, otpExpiresAt: null, OTP: null },

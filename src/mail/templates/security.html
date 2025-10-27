@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Security Alert - MadeInBlacc</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+          'Helvetica Neue', Arial, sans-serif;
+        background-color: #e5e7eb;
+        padding: 20px;
+        line-height: 1.6;
+      }
+      .email-wrapper {
+        max-width: 600px;
+        margin: 0 auto;
+        background-color: #e5e7eb;
+      }
+      .container {
+        background-color: #ffffff;
+        padding: 40px 35px;
+      }
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 50px;
+        padding-bottom: 10px;
+      }
+      .logo-container {
+        display: flex;
+        align-items: center;
+      }
+      .logo {
+        width: 50px;
+        height: 50px;
+        margin-right: 0;
+      }
+      .social-icons {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+      }
+      .social-icon {
+        width: 28px;
+        height: 28px;
+        color: #6b7280;
+        text-decoration: none;
+        font-size: 22px;
+      }
+      .alert-title {
+        font-size: 26px;
+        font-weight: 600;
+        margin-bottom: 30px;
+        color: #111827;
+        line-height: 1.3;
+      }
+      .greeting {
+        color: #111827;
+        margin-bottom: 20px;
+        font-size: 16px;
+      }
+      .alert-message {
+        color: #374151;
+        margin-bottom: 30px;
+        font-size: 16px;
+      }
+      .login-details {
+        background-color: #f9fafb;
+        padding: 20px 24px;
+        margin: 30px 0;
+        border-radius: 6px;
+      }
+      .detail-row {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 14px;
+        color: #374151;
+        font-size: 15px;
+      }
+      .detail-row:last-child {
+        margin-bottom: 0;
+      }
+      .detail-icon {
+        margin-right: 12px;
+        color: #9ca3af;
+        font-size: 16px;
+        min-width: 20px;
+      }
+      .detail-label {
+        font-weight: 500;
+        margin-right: 6px;
+        color: #6b7280;
+      }
+      .detail-value {
+        color: #111827;
+      }
+      .map-container {
+        margin: 30px 0;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+      .map-container img {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
+      .safe-message {
+        color: #374151;
+        margin: 25px 0;
+        font-size: 16px;
+      }
+      .warning-section {
+        margin: 35px 0;
+      }
+      .warning-title {
+        font-size: 22px;
+        font-weight: 600;
+        margin-bottom: 12px;
+        color: #111827;
+      }
+      .warning-text {
+        color: #374151;
+        margin-bottom: 22px;
+        font-size: 16px;
+      }
+      .secure-button {
+        display: inline-block;
+        background-color: #1f2937;
+        color: #ffffff;
+        padding: 14px 32px;
+        text-decoration: none;
+        border-radius: 6px;
+        font-weight: 500;
+        font-size: 15px;
+        transition: background-color 0.2s;
+      }
+      .secure-button:hover {
+        background-color: #111827;
+      }
+      .app-download {
+        margin: 40px 0 30px 0;
+        padding-top: 30px;
+        border-top: 1px solid #e5e7eb;
+      }
+      .app-download-text {
+        color: #374151;
+        margin-bottom: 18px;
+        font-size: 15px;
+      }
+      .app-badges {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .app-badge {
+        height: 44px;
+        width: auto;
+      }
+      .footer {
+        margin-top: 35px;
+        padding-top: 25px;
+        border-top: 1px solid #e5e7eb;
+        color: #6b7280;
+        font-size: 14px;
+        line-height: 1.6;
+      }
+      .footer p {
+        margin-bottom: 12px;
+      }
+      .footer a {
+        color: #3b82f6;
+        text-decoration: none;
+      }
+      .footer a:hover {
+        text-decoration: underline;
+      }
+      .footer-location {
+        margin-top: 18px;
+        color: #6b7280;
+      }
+      .copyright {
+        color: #9ca3af;
+      }
+      @media only screen and (max-width: 600px) {
+        .container {
+          padding: 30px 20px;
+        }
+        .header {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 20px;
+        }
+        .alert-title {
+          font-size: 22px;
+        }
+        .app-badges {
+          flex-direction: column;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="email-wrapper">
+      <div class="container">
+        <!-- Header -->
+        <div class="header">
+          <div class="logo-container">
+            <img src="{{logoUrl}}" alt="MadeInBlacc" class="logo" />
+          </div>
+          <div class="social-icons">
+            <a href="{{twitterUrl}}" class="social-icon">
+              <svg
+                width="28"
+                height="28"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path
+                  d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"
+                />
+              </svg>
+            </a>
+            <a href="{{facebookUrl}}" class="social-icon">
+              <svg
+                width="28"
+                height="28"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path
+                  d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"
+                />
+              </svg>
+            </a>
+            <a href="{{instagramUrl}}" class="social-icon">
+              <svg
+                width="28"
+                height="28"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                <path
+                  d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"
+                  fill="white"
+                />
+                <line
+                  x1="17.5"
+                  y1="6.5"
+                  x2="17.51"
+                  y2="6.5"
+                  stroke="white"
+                  stroke-width="2"
+                />
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Main Content -->
+        <h1 class="alert-title">New sign-in detected on your account</h1>
+
+        <p class="greeting">Hi {{firstName}},</p>
+
+        <p class="alert-message">
+          We noticed a new login to your MadeInBlacc account.
+        </p>
+
+        <!-- Login Details Box -->
+        <div class="login-details">
+          <div class="detail-row">
+            <span class="detail-icon">📱</span>
+            <div>
+              <span class="detail-label">Device:</span>
+              <span class="detail-value">{{device}}</span>
+            </div>
+          </div>
+          <div class="detail-row">
+            <span class="detail-icon">📍</span>
+            <div>
+              <span class="detail-label">Location:</span>
+              <span class="detail-value">{{location}}</span>
+            </div>
+          </div>
+          <div class="detail-row">
+            <span class="detail-icon">🕐</span>
+            <div>
+              <span class="detail-label">Time:</span>
+              <span class="detail-value">{{loginTime}}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Map -->
+        <div class="map-container">
+          <img
+            src="{{mapImageUrl}}"
+            alt="Login location map"
+            style="max-width: 100%"
+          />
+        </div>
+
+        <p class="safe-message">If this was you, no action is needed.</p>
+
+        <!-- Warning Section -->
+        <div class="warning-section">
+          <h2 class="warning-title">If Not you?</h2>
+          <p class="warning-text">secure your account immediately.</p>
+          <a href="{{secureAccountUrl}}" class="secure-button"
+            >Secure My Account</a
+          >
+        </div>
+
+        <!-- App Download Section -->
+        <div class="app-download">
+          <p class="app-download-text">
+            Madeinblacc at the touch of a button! Download our app for Google &
+            App store.
+          </p>
+          <div class="app-badges">
+            <a href="{{googlePlayUrl}}">
+              <img
+                src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
+                alt="Get it on Google Play"
+                class="app-badge"
+              />
+            </a>
+            <a href="{{appleUrl}}">
+              <img
+                src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg"
+                alt="Download on the App Store"
+                class="app-badge"
+              />
+            </a>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+          <p>
+            Questions or faq? Contact us at
+            <a href="mailto:Contact@madeinblacc.net">Contact@madeinblacc.net</a>
+          </p>
+          <p>
+            If you'd rather not receive this kind of email, Don't want any more
+            emails from Madeinblacc?
+            <a href="{{unsubscribeUrl}}">Unsubscribe</a>.
+          </p>
+
+          <div class="footer-location">
+            <p>Awka, Anambra state, Nigeria</p>
+            <p class="copyright">© 2025 Madeinblacc</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

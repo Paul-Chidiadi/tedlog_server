@@ -7,6 +7,7 @@ import {
   HttpStatus,
   Patch,
   Post,
+  Req,
   Res,
   UseGuards,
 } from '@nestjs/common';
@@ -43,10 +44,15 @@ export class AuthController {
   }
 
   @Post('login')
-  async login(@Body() body: LoginDto, @Res() res: any) {
+  async login(@Req() request: any, @Body() body: LoginDto, @Res() res: any) {
+    // Get device and location info
+    const userAgent = request.headers['user-agent'];
+    const ip = request.ip;
     const { user, accessToken, refreshToken } = await this.authService.login(
       body.email,
       body.password,
+      userAgent,
+      ip,
     );
     if (user) {
       // Set JWT token as a cookie in the response

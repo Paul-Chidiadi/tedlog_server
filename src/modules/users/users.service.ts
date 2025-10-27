@@ -2,6 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { Repository, UpdateResult } from 'typeorm';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ICurrentUser } from './interfaces/user.interface';
 
 @Injectable()
 export class UsersService {
@@ -109,6 +110,21 @@ export class UsersService {
     email: string,
   ): Promise<UpdateResult> {
     return await this.userRepository.update({ email }, payload);
+  }
+
+  async claimReward(currentUser: ICurrentUser): Promise<UpdateResult> {
+    const userEmail = currentUser.email;
+    const user = await this.findByEmail(userEmail);
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    const payload: Partial<User> = {
+      streakCount: user.streakCount + 1,
+      totalShellsEarned: user.totalShellsEarned + 5,
+    };
+
+    return await this.userRepository.update({ email: userEmail }, payload);
   }
 
   async suspendUser(id: string): Promise<UpdateResult> {

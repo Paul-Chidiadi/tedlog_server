@@ -41,6 +41,23 @@ export class UsersController {
     );
   }
 
+  @UseGuards(AuthGuard)
+  @Patch('/daily-claim')
+  async claimReward(
+    @CurrentUser() currentUser: ICurrentUser,
+    @Res() response: Response,
+  ) {
+    const user = await this.usersService.claimReward(currentUser);
+
+    if (user) {
+      return CreateSuccessResponse(response, user, 'Successful');
+    }
+    throw new HttpException(
+      'Can not claim Reward. Please try again later!',
+      HttpStatus.INTERNAL_SERVER_ERROR,
+    );
+  }
+
   @Roles(USER_ROLE.ADMIN)
   @UseGuards(AuthGuard, RolesGuard)
   @Patch('suspend/:id')

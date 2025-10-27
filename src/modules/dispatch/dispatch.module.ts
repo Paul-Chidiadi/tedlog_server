@@ -9,10 +9,17 @@ import { Voucher } from './entities/voucher.entity';
 import { Dispatch } from './entities/dispatch.entity';
 import { PaymentsService } from '../payments/payments.service';
 import { Payment } from '../payments/entities/payments.entity';
+import { EmailService } from 'src/common/utils/email.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Dispatch, User, Voucher, Payment])],
   controllers: [DispatchController],
-  providers: [DispatchService, UsersService, Utilities, PaymentsService],
+  providers: [
+    DispatchService,
+    UsersService,
+    Utilities,
+    EmailService,
+    PaymentsService,
+  ],
 })
 export class DispatchModule {}

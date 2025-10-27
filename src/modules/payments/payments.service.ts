@@ -11,6 +11,7 @@ import { CowrieService } from '../karthlog/cowrie/cowrie.service';
 import { User } from '../users/entities/user.entity';
 import { NotificationsService } from '../notifications/notifications.service';
 import { NOTIFICATION_TYPE } from '../notifications/interfaces/notification.interface';
+import { EmailService } from 'src/common/utils/email.service';
 
 @Injectable()
 export class PaymentsService {
@@ -20,6 +21,7 @@ export class PaymentsService {
 
     private readonly usersService: UsersService,
     private readonly cowrieService: CowrieService,
+    private readonly emailService: EmailService,
 
     private notificationService: NotificationsService,
   ) {}
@@ -110,6 +112,12 @@ export class PaymentsService {
         notificationType: NOTIFICATION_TYPE.WALLET_BALANCE,
       });
     }
+
+    const sendMail = await this.emailService.sendPaymentConfirmation(
+      email,
+      user.name.split(' ')[0],
+      { amount, transactionId, transactionDate: paymentDate },
+    );
 
     const paymentData = await this.paymentRepository.save(
       transactionDataPayload,
